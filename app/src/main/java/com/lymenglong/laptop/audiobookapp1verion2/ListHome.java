@@ -57,6 +57,7 @@ public class ListHome extends AppCompatActivity{
     private static final String getHistoryURL = "http://20121969.tk/audiobook/books/getHistory.php";
     private static final String getFavoriteURL = "http://20121969.tk/audiobook/books/getFavorite.php";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +79,7 @@ public class ListHome extends AppCompatActivity{
             listChapter.setAdapter(adapter);
         }
 
-        if(idHome == 3){ //lich su
+        if(idHome == 2){ //lich su
             stringRequest = new StringRequest(Request.Method.POST, getHistoryURL,
                     new Response.Listener<String>() {
                         @Override
@@ -97,7 +98,7 @@ public class ListHome extends AppCompatActivity{
             );
             requestQueue.add(stringRequest);
         }
-        if(idHome== 4) { // yeu thich
+        if(idHome== 3) { // yeu thich
             stringRequest = new StringRequest(Request.Method.POST, getFavoriteURL,
                     new Response.Listener<String>() {
                         @Override
@@ -115,17 +116,17 @@ public class ListHome extends AppCompatActivity{
             );
             requestQueue.add(stringRequest);
         }
-        if(idHome == 5){ // tai khoan
+        if(idHome == 4){ // tai khoan
             Intent intent  = new Intent(this, UserInfoActivity.class);
             this.finish();
             this.startActivity(intent);
         }
-        if(idHome == 6){ // huong dan
+        if(idHome == 5){ // huong dan
             Intent intent  = new Intent(this, HelpActivity.class);
             this.finish();
             this.startActivity(intent);
         }
-        if(idHome == 7){ // thoát
+        if(idHome == 0){ // thoát
             activity.finish();
         }
         else return;
@@ -273,6 +274,9 @@ public class ListHome extends AppCompatActivity{
         listChapter.setLayoutManager(mLinearLayoutManager);
         listChapter.setAdapter(favoriteAdapter);
     }
+
+
+
 
 
 }

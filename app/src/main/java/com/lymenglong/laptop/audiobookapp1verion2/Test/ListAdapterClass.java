@@ -1,9 +1,5 @@
 package com.lymenglong.laptop.audiobookapp1verion2.Test;
 
-/**
- * Created by Juned on 3/4/2017.
- */
-
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;

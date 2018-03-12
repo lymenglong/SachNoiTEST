@@ -21,12 +21,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShowAllStudentsActivity extends AppCompatActivity {
+public class ShowAllBookActivity extends AppCompatActivity {
 
     ListView StudentListView;
     ProgressBar progressBar;
-    String HttpUrl = "http://192.168.54.95/Student/AllStudentData.php";
-//    String HttpUrl = "https://androidjsonblog.000webhostapp.com/Student/AllStudentData.php";
+//    String HttpUrl = "http://20121969.tk/SachNoiBKIC/AllBookData.php"; //all book data url
+    String HttpUrl = "http://20121969.tk/SachNoiBKIC/AllMenuData.php";
     List<String> IdList = new ArrayList<>();
 
     @Override
@@ -40,7 +40,7 @@ public class ShowAllStudentsActivity extends AppCompatActivity {
 
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
 
-        new GetHttpResponse(ShowAllStudentsActivity.this).execute();
+        new GetHttpResponse(ShowAllBookActivity.this).execute();
 
         //region Adding ListView Item click Listener.
         StudentListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -50,7 +50,7 @@ public class ShowAllStudentsActivity extends AppCompatActivity {
 
                 // TODO Auto-generated method stub
 
-                Intent intent = new Intent(ShowAllStudentsActivity.this,ShowSingleRecordActivity.class);
+                Intent intent = new Intent(ShowAllBookActivity.this,ShowSingleRecordActivity.class);
 
                 // Sending ListView clicked value using intent.
                 intent.putExtra("ListViewValue", IdList.get(position).toString());
@@ -118,10 +118,10 @@ public class ShowAllStudentsActivity extends AppCompatActivity {
                                 jsonObject = jsonArray.getJSONObject(i);
 
                                 // Adding Student Id TO IdList Array.
-                                IdList.add(jsonObject.getString("id").toString());
+                                IdList.add(jsonObject.getString("Id").toString());
 
                                 //Adding Student Name.
-                                student.StudentName = jsonObject.getString("name").toString();
+                                student.StudentName = jsonObject.getString("Name").toString();
 
                                 studentList.add(student);
 
