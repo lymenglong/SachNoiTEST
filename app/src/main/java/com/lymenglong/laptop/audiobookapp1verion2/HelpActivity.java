@@ -80,7 +80,7 @@ public class HelpActivity extends AppCompatActivity {
         actionBar = new CustomActionBar();
 //        actionBar.eventToolbar(this, titleHome, true);
         actionBar.eventToolbar(this, "Hướng Dẫn", false );
-        listChapter = (RecyclerView) findViewById(R.id.list_chapter);
+        listChapter = (RecyclerView) findViewById(R.id.listView);
         tvReadFile = (TextView) findViewById(R.id.tv_read_file);
     }
 }

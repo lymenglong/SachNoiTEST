@@ -2,22 +2,27 @@ package com.lymenglong.laptop.audiobookapp1verion2;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.lymenglong.laptop.audiobookapp1verion2.Test.ListAdapterClass;
 import com.lymenglong.laptop.audiobookapp1verion2.Test.Student;
 import com.lymenglong.laptop.audiobookapp1verion2.adapter.MainAdapter;
+import com.lymenglong.laptop.audiobookapp1verion2.databases.DBHelper;
 import com.lymenglong.laptop.audiobookapp1verion2.databases.DatabaseHelper;
 import com.lymenglong.laptop.audiobookapp1verion2.http.HttpServicesClass;
 import com.lymenglong.laptop.audiobookapp1verion2.model.Home;
 
+import org.apache.http.client.methods.HttpOptions;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,7 +45,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     String HttpUrl = "http://20121969.tk/SachNoiBKIC/AllMenuData.php";
-    List<String> IdList = new ArrayList<>();
+
+    DBHelper dbHelper;
+
+    ArrayList<Home> menuList;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +57,40 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getDataFromIntent();
         initView();
+        initObject();
+        initDatabase();
         //get data from json parsing
         new MainActivity.GetHttpResponse(MainActivity.this).execute();
-//        initObject();
-//        getJSON(URL);
+    }
+
+    private void initDatabase() {
+        String DB_NAME = "menu.sqlite";
+        int DB_VERSION = 1;
+//        String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS menu(Id INTEGER PRIMARY KEY AUTOINCREMENT, MenuName VARCHAR(255));";
+        String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS menu(Id INTEGER PRIMARY KEY, MenuName VARCHAR(255));";
+        dbHelper = new DBHelper(this,DB_NAME ,null,DB_VERSION);
+        //create database
+        dbHelper.QueryData(CREATE_TABLE);
+
+    }
+
+    private void GetCursorData() {
+        Cursor cursor = dbHelper.GetData("SELECT * FROM menu");
+        while (cursor.moveToNext()){
+            String name = cursor.getString(1);
+            int id = cursor.getInt(0);
+            menuList.add(new Home(id,name));
+        }
+        cursor.close();
+        mainAdapter.notifyDataSetChanged();
+
     }
 
     private void initObject() {
-        homes = databaseHelper.getHomeList();
-        mainAdapter = new MainAdapter(MainActivity.this, homes);
+//        homes = databaseHelper.getHomeList();
+        menuList = new ArrayList<>();
+        mainAdapter = new MainAdapter(MainActivity.this, menuList);
+//        mainAdapter = new MainAdapter(MainActivity.this, homes);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         homeList.setLayoutManager(mLinearLayoutManager);
         homeList.setAdapter(mainAdapter);
@@ -73,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         homeList = (RecyclerView) findViewById(R.id.listView);
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
         databaseHelper = new DatabaseHelper(this);
     }
 
@@ -142,9 +177,18 @@ public class MainActivity extends AppCompatActivity {
                                 //Adding Student Name.
 //                                student.StudentName = jsonObject.getString("Name").toString();
                                 homeModel.setTitle(jsonObject.getString("Name").toString());
-
                                 home.add(homeModel);
-
+                                int Id = homeModel.getId();
+                                String MenuName = homeModel.getTitle();
+                                if (menuList.size()>=home.size()) {
+                                    if (!homeModel.getTitle().equals(menuList.get(i).getTitle())) {
+                                        String UPDATE_DATA = "UPDATE menu SET MenuName = '"+MenuName+"' WHERE Id = '"+Id+"'";
+                                        dbHelper.QueryData(UPDATE_DATA);
+                                    }
+                                } else {
+                                    String INSERT_DATA = "INSERT INTO menu VALUES('"+Id+"','"+MenuName+"')";
+                                    dbHelper.QueryData(INSERT_DATA);
+                                }
                             }
                         }
                         catch (JSONException e) {
@@ -169,15 +213,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result)
         {
-
-            mainAdapter = new MainAdapter(MainActivity.this, home);
-            LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(MainActivity.this);
-            homeList.setLayoutManager(mLinearLayoutManager);
-            homeList.setAdapter(mainAdapter);
-
+            progressBar.setVisibility(View.GONE);
+            GetCursorData();
+            Log.d("MyTagView", "onPostExecute");
         }
     }
     //endregion
+
 
 
 
@@ -239,4 +281,5 @@ public class MainActivity extends AppCompatActivity {
         homeList.setAdapter(mainAdapter);
     }
     //endregion
+
 }

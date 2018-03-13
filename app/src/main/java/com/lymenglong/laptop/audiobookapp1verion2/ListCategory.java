@@ -26,7 +26,7 @@ public class ListCategory extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_all_book);
+        setContentView(R.layout.activity_list_chapter);
         getDataFromIntent();
         init();
     }
@@ -45,7 +45,7 @@ public class ListCategory extends AppCompatActivity{
     private void init() {
         actionBar = new CustomActionBar();
         actionBar.eventToolbar(this, titleChapter, false);
-        listChapter = (RecyclerView) findViewById(R.id.list_small_chapter);
+        listChapter = (RecyclerView) findViewById(R.id.listView);
 
         databaseHelper = new DatabaseHelper(this);
         chapters = databaseHelper.getListSmallChapter(idChapter);

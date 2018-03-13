@@ -127,7 +127,7 @@ public class ListHome extends AppCompatActivity{
             this.startActivity(intent);
         }
         if(idHome == 0){ // thoát
-            activity.finish();
+//            activity.finish();
         }
         else return;
 
@@ -150,7 +150,7 @@ public class ListHome extends AppCompatActivity{
         requestQueue = Volley.newRequestQueue(activity);
         actionBar = new CustomActionBar();
         actionBar.eventToolbar(this, titleHome, false);
-        listChapter = (RecyclerView) findViewById(R.id.list_chapter);
+        listChapter = (RecyclerView) findViewById(R.id.listView);
     }
 
 
