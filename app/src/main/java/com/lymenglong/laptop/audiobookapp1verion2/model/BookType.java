@@ -6,6 +6,11 @@ public class BookType {
     private String title;
     private String content;
 
+    public BookType(int id, String title) {
+        this.id = id;
+        this.title = title;
+    }
+
     public BookType(int id, String title, String content) {
         this.id = id;
         this.title = title;

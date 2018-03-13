@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,8 +13,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.lymenglong.laptop.audiobookapp1verion2.Test.ListAdapterClass;
-import com.lymenglong.laptop.audiobookapp1verion2.Test.Student;
 import com.lymenglong.laptop.audiobookapp1verion2.adapter.MainAdapter;
 import com.lymenglong.laptop.audiobookapp1verion2.databases.DBHelper;
 import com.lymenglong.laptop.audiobookapp1verion2.databases.DatabaseHelper;
@@ -57,17 +54,33 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getDataFromIntent();
         initView();
-        initObject();
         initDatabase();
+        initObject();
         //get data from json parsing
-        new MainActivity.GetHttpResponse(MainActivity.this).execute();
+        new GetHttpResponse(this).execute();
     }
+
+    // to make application remember pass LoginActivity in to MainActivity
+    private void getDataFromIntent() {
+        if (getIntent().getBooleanExtra("EXIT", false)) {
+            finish();
+            Intent intent = new Intent(this, LoginActivity2.class);
+            startActivity(intent);
+        }
+    }
+
+    private void initView() {
+        homeList = (RecyclerView) findViewById(R.id.listView);
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
+        databaseHelper = new DatabaseHelper(this);
+    }
+
 
     private void initDatabase() {
         String DB_NAME = "menu.sqlite";
         int DB_VERSION = 1;
 //        String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS menu(Id INTEGER PRIMARY KEY AUTOINCREMENT, MenuName VARCHAR(255));";
-        String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS menu(Id INTEGER PRIMARY KEY, MenuName VARCHAR(255));";
+        String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS menu(Id INTEGER PRIMARY KEY, Name VARCHAR(255));";
         dbHelper = new DBHelper(this,DB_NAME ,null,DB_VERSION);
         //create database
         dbHelper.QueryData(CREATE_TABLE);
@@ -95,24 +108,6 @@ public class MainActivity extends AppCompatActivity {
         homeList.setLayoutManager(mLinearLayoutManager);
         homeList.setAdapter(mainAdapter);
     }
-
-    // to make application remember pass LoginActivity in to MainActivity
-    private void getDataFromIntent() {
-        if (getIntent().getBooleanExtra("EXIT", false)) {
-            finish();
-            Intent intent = new Intent(this, LoginActivity2.class);
-            startActivity(intent);
-        }
-    }
-
-    private void initView() {
-        homeList = (RecyclerView) findViewById(R.id.listView);
-        progressBar = (ProgressBar)findViewById(R.id.progressBar);
-        databaseHelper = new DatabaseHelper(this);
-    }
-
-
-
 
     //region JSON parse class started from here.
     private class GetHttpResponse extends AsyncTask<Void, Void, Void>
@@ -179,14 +174,14 @@ public class MainActivity extends AppCompatActivity {
                                 homeModel.setTitle(jsonObject.getString("Name").toString());
                                 home.add(homeModel);
                                 int Id = homeModel.getId();
-                                String MenuName = homeModel.getTitle();
+                                String Name = homeModel.getTitle();
                                 if (menuList.size()>=home.size()) {
                                     if (!homeModel.getTitle().equals(menuList.get(i).getTitle())) {
-                                        String UPDATE_DATA = "UPDATE menu SET MenuName = '"+MenuName+"' WHERE Id = '"+Id+"'";
+                                        String UPDATE_DATA = "UPDATE menu SET Name = '"+Name+"' WHERE Id = '"+Id+"'";
                                         dbHelper.QueryData(UPDATE_DATA);
                                     }
                                 } else {
-                                    String INSERT_DATA = "INSERT INTO menu VALUES('"+Id+"','"+MenuName+"')";
+                                    String INSERT_DATA = "INSERT INTO menu VALUES('"+Id+"','"+Name+"')";
                                     dbHelper.QueryData(INSERT_DATA);
                                 }
                             }

@@ -67,6 +67,7 @@ public class ListBook extends AppCompatActivity{
         actionBar = new CustomActionBar();
         actionBar.eventToolbar(this, titleChapter, true);
         listChapter = (RecyclerView) findViewById(R.id.listView);
+
         requestQueue = Volley.newRequestQueue(this);
         stringRequest = new StringRequest(Request.Method.POST, URL,
                 new Response.Listener<String>() {

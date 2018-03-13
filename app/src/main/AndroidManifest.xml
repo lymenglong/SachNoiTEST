@@ -118,6 +118,13 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".Test.ShowCategoryActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.RUN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
