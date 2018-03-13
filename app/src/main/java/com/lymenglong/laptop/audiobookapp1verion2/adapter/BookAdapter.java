@@ -14,20 +14,20 @@ import android.widget.TextView;
 import com.lymenglong.laptop.audiobookapp1verion2.PlayControl;
 import com.lymenglong.laptop.audiobookapp1verion2.R;
 import com.lymenglong.laptop.audiobookapp1verion2.ViewReading;
-import com.lymenglong.laptop.audiobookapp1verion2.model.Chapter;
+import com.lymenglong.laptop.audiobookapp1verion2.model.Book;
 
 import java.util.ArrayList;
 
 
 public class BookAdapter extends RecyclerView.Adapter {
-    private ArrayList<Chapter> chapters;
+    private ArrayList<Book> books;
     private Activity activity;
     private View view;
     private int getIdChapter;
     private String getTitleChapter, getContentChapter, getfileUrlChapter;
 
-    public BookAdapter(Activity activity, ArrayList<Chapter> chapters) {
-        this.chapters = chapters;
+    public BookAdapter(Activity activity, ArrayList<Book> books) {
+        this.books = books;
         this.activity = activity;
     }
 
@@ -43,7 +43,7 @@ public class BookAdapter extends RecyclerView.Adapter {
         if (holder instanceof ChapterHolder) {
             ChapterHolder chapterHolder = (ChapterHolder) holder;
 
-            chapterHolder.name.setText(chapters.get(position).getTitle());
+            chapterHolder.name.setText(books.get(position).getTitle());
         }
 
     }
@@ -55,7 +55,7 @@ public class BookAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        return chapters.size();
+        return books.size();
     }
 
     class ChapterHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -74,10 +74,10 @@ public class BookAdapter extends RecyclerView.Adapter {
         @Override
         public void onClick(View view) {
             if(view == itemView) {
-                getIdChapter = chapters.get(getAdapterPosition()).getId();
-                getTitleChapter = chapters.get(getAdapterPosition()).getTitle();
-                getContentChapter = chapters.get(getAdapterPosition()).getContent();
-                getfileUrlChapter = chapters.get(getAdapterPosition()).getFileUrl();
+                getIdChapter = books.get(getAdapterPosition()).getId();
+                getTitleChapter = books.get(getAdapterPosition()).getTitle();
+                getContentChapter = books.get(getAdapterPosition()).getContent();
+                getfileUrlChapter = books.get(getAdapterPosition()).getFileUrl();
                 showAlertDialog();
             }
         }

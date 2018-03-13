@@ -6,6 +6,23 @@ public class Book {
     private String title;
     private String content;
     private Boolean status; //when status is true, it means that you select audio book
+    private String FileUrl;
+
+    public String getFileUrl() {
+        return FileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        FileUrl = fileUrl;
+    }
+
+    public Book(int id, String title, String content, String fileUrl) {
+
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        FileUrl = fileUrl;
+    }
 
     public Book(int id, String title, String content, Boolean status) {
         this.id = id;

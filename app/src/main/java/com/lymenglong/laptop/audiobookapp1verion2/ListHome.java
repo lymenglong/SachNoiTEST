@@ -233,7 +233,7 @@ public class ListHome extends AppCompatActivity{
                                 String Name = bookTypeModel.getTitle();
                                 if (list.size()>= bookTypes.size()) {
                                     if (!bookTypeModel.getTitle().equals(list.get(i).getTitle())) {
-                                        String UPDATE_DATA = "UPDATE menu SET Name = '"+Name+"' WHERE Id = '"+Id+"'";
+                                        String UPDATE_DATA = "UPDATE booktype SET Name = '"+Name+"' WHERE Id = '"+Id+"'";
                                         dbHelper.QueryData(UPDATE_DATA);
                                     }
                                 } else {

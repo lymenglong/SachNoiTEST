@@ -1,6 +1,5 @@
 package com.lymenglong.laptop.audiobookapp1verion2;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -12,9 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.lymenglong.laptop.audiobookapp1verion2.Test.ShowCategoryActivity;
 import com.lymenglong.laptop.audiobookapp1verion2.adapter.CategoryAdapter;
 import com.lymenglong.laptop.audiobookapp1verion2.customize.CustomActionBar;
 import com.lymenglong.laptop.audiobookapp1verion2.databases.DBHelper;
@@ -55,8 +52,6 @@ public class ListCategory extends AppCompatActivity{
     // Http Url For Filter Student Data from Id Sent from previous activity.
     String HttpURL = "http://20121969.tk/SachNoiBKIC/FilterCategoryData.php";
 
-    String finalResult ;
-    HashMap<String,String> hashMap = new HashMap<>();
     String ParseResult ;
     HashMap<String,String> ResultHash = new HashMap<>();
     String FinalJSonObject ;
@@ -106,7 +101,7 @@ public class ListCategory extends AppCompatActivity{
     private void initDatabase() {
         String DB_NAME = "menu.sqlite";
         int DB_VERSION = 1;
-        String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS category(Id INTEGER PRIMARY KEY, Name VARCHAR(255));";
+        String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS category(Id INTEGER PRIMARY KEY, Name VARCHAR(255), TypeID INTEGER);";
         dbHelper = new DBHelper(this,DB_NAME ,null,DB_VERSION);
         //create database
         dbHelper.QueryData(CREATE_TABLE);
@@ -114,11 +109,14 @@ public class ListCategory extends AppCompatActivity{
     }
 
     private void GetCursorData() {
+        list.clear();
         Cursor cursor = dbHelper.GetData("SELECT * FROM category");
         while (cursor.moveToNext()){
-            String name = cursor.getString(1);
-            int id = cursor.getInt(0);
-            list.add(new Category(id,name));
+            if(cursor.getInt(2)== idChapter){
+                String name = cursor.getString(1);
+                int id = cursor.getInt(0);
+                list.add(new Category(id,name));
+            }
         }
         cursor.close();
         adapter.notifyDataSetChanged();
@@ -339,11 +337,11 @@ public class ListCategory extends AppCompatActivity{
                             String Name = categoryModel.getTitle();
                             if (list.size()>= categories.size()) {
                                 if (!categoryModel.getTitle().equals(list.get(i).getTitle())) {
-                                    String UPDATE_DATA = "UPDATE menu SET Name = '"+Name+"' WHERE Id = '"+Id+"'";
+                                    String UPDATE_DATA = "UPDATE category SET Name = '"+Name+"' WHERE Id = '"+Id+"' AND TypeID = '"+idChapter+"'";
                                     dbHelper.QueryData(UPDATE_DATA);
                                 }
                             } else {
-                                String INSERT_DATA = "INSERT INTO category VALUES('"+Id+"','"+Name+"')";
+                                String INSERT_DATA = "INSERT INTO category VALUES('"+Id+"','"+Name+"','"+idChapter+"')";
                                 dbHelper.QueryData(INSERT_DATA);
                             }
                         }
@@ -368,7 +366,7 @@ public class ListCategory extends AppCompatActivity{
 
             progressBar.setVisibility(View.GONE);
             GetCursorData();
-            Log.d("MyTagView", "onPostExecute");
+            Log.d("MyTagView", "onPostExecute: "+ titleChapter);
 
         }
     }

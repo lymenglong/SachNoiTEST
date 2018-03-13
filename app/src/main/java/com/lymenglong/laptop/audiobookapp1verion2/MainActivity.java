@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void GetCursorData() {
+        menuList.clear();
         Cursor cursor = dbHelper.GetData("SELECT * FROM menu");
         while (cursor.moveToNext()){
             String name = cursor.getString(1);

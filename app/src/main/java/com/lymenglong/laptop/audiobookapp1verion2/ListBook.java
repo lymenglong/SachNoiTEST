@@ -1,22 +1,26 @@
 package com.lymenglong.laptop.audiobookapp1verion2;
 
 import android.app.Activity;
+import android.content.Context;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Toast;
+import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.lymenglong.laptop.audiobookapp1verion2.adapter.BookAdapter;
 import com.lymenglong.laptop.audiobookapp1verion2.customize.CustomActionBar;
+import com.lymenglong.laptop.audiobookapp1verion2.databases.DBHelper;
 import com.lymenglong.laptop.audiobookapp1verion2.databases.DatabaseHelper;
+import com.lymenglong.laptop.audiobookapp1verion2.http.HttpParse;
+import com.lymenglong.laptop.audiobookapp1verion2.model.Book;
+import com.lymenglong.laptop.audiobookapp1verion2.model.Category;
 import com.lymenglong.laptop.audiobookapp1verion2.model.Chapter;
 
 import org.json.JSONArray;
@@ -28,11 +32,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ListBook extends AppCompatActivity{
     private RecyclerView listChapter;
     private ArrayList<Chapter> chapters;
-    private Chapter chapterModel;
+    private Book bookModel;
     private BookAdapter adapter;
     private CustomActionBar actionBar;
     private DatabaseHelper databaseHelper;
@@ -42,6 +47,14 @@ public class ListBook extends AppCompatActivity{
     private static final String URL = "http://20121969.tk/audiobook/books/getAllBooks.php";
     private StringRequest stringRequest;
     private RequestQueue requestQueue;
+    private DBHelper dbHelper;
+    private String FinalJSonObject;
+    private HashMap<String, String> ResultHash = new HashMap<>();
+    private String ParseResult;
+    private HttpParse httpParse = new HttpParse();
+    private String HttpURL = "http://20121969.tk/SachNoiBKIC/FilterBookData.php";
+    private ArrayList <Book> list;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +62,8 @@ public class ListBook extends AppCompatActivity{
         setContentView(R.layout.activity_list_chapter);
         getDataFromIntent();
         init();
+        initDatabase();
+        initObject();
     }
 
 
@@ -67,8 +82,9 @@ public class ListBook extends AppCompatActivity{
         actionBar = new CustomActionBar();
         actionBar.eventToolbar(this, titleChapter, true);
         listChapter = (RecyclerView) findViewById(R.id.listView);
+        progressBar = findViewById(R.id.progressBar);
 
-        requestQueue = Volley.newRequestQueue(this);
+/*        requestQueue = Volley.newRequestQueue(this);
         stringRequest = new StringRequest(Request.Method.POST, URL,
                 new Response.Listener<String>() {
                     @Override
@@ -84,7 +100,7 @@ public class ListBook extends AppCompatActivity{
                     }
                 }
         );
-        requestQueue.add(stringRequest);
+        requestQueue.add(stringRequest);*/
 
 /*
         databaseHelper = new DatabaseHelper(this);
@@ -97,6 +113,179 @@ public class ListBook extends AppCompatActivity{
 
     }
 
+    private void initDatabase() {
+        String DB_NAME = "menu.sqlite";
+        int DB_VERSION = 1;
+        String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS book (Id INTEGER PRIMARY KEY, Name VARCHAR(255), CategoryID INTEGER);";
+        dbHelper = new DBHelper(this,DB_NAME ,null,DB_VERSION);
+        //create database
+        dbHelper.QueryData(CREATE_TABLE);
+
+    }
+
+    private void GetCursorData() {
+        list.clear();
+        Cursor cursor = dbHelper.GetData("SELECT * FROM book");
+        while (cursor.moveToNext()){
+            if(cursor.getInt(2)== idChapter){
+                String name = cursor.getString(1);
+                int id = cursor.getInt(0);
+                list.add(new Book(id,name));
+            }
+        }
+        cursor.close();
+        adapter.notifyDataSetChanged();
+
+    }
+
+    private void initObject() {
+        list = new ArrayList<>();
+        adapter = new BookAdapter(ListBook.this, list);
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
+        listChapter.setLayoutManager(mLinearLayoutManager);
+        listChapter.setAdapter(adapter);
+            /*//get data from json parsing
+            new GetHttpResponse(this).execute();*/
+        HttpWebCall(String.valueOf(idChapter));
+    }
+
+
+    //Method to show current record Current Selected Record
+    public void HttpWebCall(final String PreviousListViewClickedItem){
+
+        class HttpWebCallFunction extends AsyncTask<String,Void,String> {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+
+//                pDialog = ProgressDialog.show(ShowCategoryActivity.this,"Loading Data",null,true,true);
+            }
+
+            @Override
+            protected void onPostExecute(String httpResponseMsg) {
+
+                super.onPostExecute(httpResponseMsg);
+
+//                pDialog.dismiss();
+
+                //Storing Complete JSon Object into String Variable.
+                FinalJSonObject = httpResponseMsg ;
+
+                //Parsing the Stored JSOn String to GetHttpResponse Method.
+                new GetHttpResponse(ListBook.this).execute();
+
+            }
+
+            @Override
+            protected String doInBackground(String... params) {
+
+                ResultHash.put("CategoryID",params[0]);
+
+                ParseResult = httpParse.postRequest(ResultHash, HttpURL);
+
+                return ParseResult;
+            }
+        }
+
+        HttpWebCallFunction httpWebCallFunction = new HttpWebCallFunction();
+
+        httpWebCallFunction.execute(PreviousListViewClickedItem);
+    }
+
+
+    // Parsing Complete JSON Object.
+    private class GetHttpResponse extends AsyncTask<Void, Void, Void>
+    {
+        public Context context;
+
+        ArrayList<Book> books;
+
+        public GetHttpResponse(Context context)
+        {
+            this.context = context;
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0)
+        {
+            try
+            {
+                if(FinalJSonObject != null)
+                {
+                    JSONArray jsonArray = null;
+
+                    try {
+                        jsonArray = new JSONArray(FinalJSonObject);
+
+                        JSONObject jsonObject;
+
+                        Book bookModel;
+//                            studentList = new ArrayList<Student>();
+                        books = new ArrayList<>();
+
+                        for(int i=0; i<jsonArray.length(); i++)
+                        {
+//                                student = new Student();
+                            bookModel = new Book();
+
+                            jsonObject = jsonArray.getJSONObject(i);
+
+                            bookModel.setId(Integer.parseInt(jsonObject.getString("Id")));
+
+                            bookModel.setTitle(jsonObject.getString("Name").toString());
+
+
+                            books.add(bookModel);
+
+                            int Id = bookModel.getId();
+                            String Name = bookModel.getTitle();
+                            if (list.size()>= books.size()) {
+                                if (!bookModel.getTitle().equals(list.get(i).getTitle())) {
+                                    String UPDATE_DATA = "UPDATE book SET Name = '"+Name+"' WHERE Id = '"+Id+"' AND TypeID = '"+idChapter+"'";
+                                    dbHelper.QueryData(UPDATE_DATA);
+                                }
+                            } else {
+                                String INSERT_DATA = "INSERT INTO book VALUES('"+Id+"','"+Name+"','"+idChapter+"')";
+                                dbHelper.QueryData(INSERT_DATA);
+                            }
+                        }
+                    }
+                    catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result)
+        {
+
+            progressBar.setVisibility(View.GONE);
+            GetCursorData();
+            Log.d("MyTagView", "onPostExecute: "+ titleChapter);
+
+        }
+    }
+
+
+
+
+    //region getJSON old code
     private void getJSON(final String urlWebService) {
 
         class GetJSON extends AsyncTask<Void, Void, String> {
@@ -137,25 +326,24 @@ public class ListBook extends AppCompatActivity{
         GetJSON getJSON = new GetJSON();
         getJSON.execute();
     }
-
-
     public void getListFromJSON(String json) throws JSONException {
         JSONArray jsonArray = new JSONArray(json);
-        ArrayList<Chapter> chapters = new ArrayList<>();
+        ArrayList<Book> books = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject obj = jsonArray.getJSONObject(i);
             if(obj.getInt("categoryid")== idChapter) {
-                chapterModel = new Chapter(obj.getInt("id"),
+                bookModel = new Book(obj.getInt("id"),
                      obj.getString("name"),
                      obj.getString("textcontent"),
                      obj.getString("fileurl"));
-                chapters.add(chapterModel);
+                books.add(bookModel);
             }
         }
-        adapter = new BookAdapter(activity, chapters);
+        adapter = new BookAdapter(activity, books);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         listChapter.setLayoutManager(mLinearLayoutManager);
         listChapter.setAdapter(adapter);
     }
+    //endregion
 
 }
