@@ -64,6 +64,7 @@ public class PlayControl extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_control);
         initDataFromIntent();
+        setTitle("Audio Player");
         initCheckBookUrl(); //finish activity when getFileUrlChapter is empty
         initToolbar();
         initView();

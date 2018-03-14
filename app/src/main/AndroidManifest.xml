@@ -23,6 +23,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
+            android:label="@string/hint_home_screen"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.RUN" />
@@ -42,6 +43,7 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".LoginActivity2"
+            android:label="@string/hint_login"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.RUN" />
@@ -51,6 +53,7 @@
         </activity>
         <activity
             android:name=".RegisterActivity3"
+            android:label="@string/hint_register"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.RUN" />
@@ -71,6 +74,7 @@
 
         <activity
             android:name=".HelpActivity"
+            android:label="@string/hint_help"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.RUN" />
@@ -81,6 +85,7 @@
 
         <activity
             android:name=".UserInfoActivity"
+            android:label="@string/hint_accountInfo"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.RUN" />

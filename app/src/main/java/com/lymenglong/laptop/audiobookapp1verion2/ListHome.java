@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -75,8 +76,9 @@ public class ListHome extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_chapter);
-//        ViewCompat.setImportantForAccessibility(getWindow().getDecorView(),ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        ViewCompat.setImportantForAccessibility(getWindow().findViewById(R.id.tvToolbar), ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO);
         getDataFromIntent();
+        setTitle(titleHome);
         initView();
         initDatabase();
         initObject();
@@ -163,7 +165,7 @@ public class ListHome extends AppCompatActivity{
             this.startActivity(intent);
         }
         if(idHome == 0){ // thoát
-//            activity.finish();
+            activity.finish();
         }
         else return;
     }
@@ -266,7 +268,7 @@ public class ListHome extends AppCompatActivity{
         {
             progressBar.setVisibility(View.GONE);
             GetCursorData();
-            Log.d("MyTagView", "onPostExecute");
+            Log.d("MyTagView", "onPostExecute: "+titleHome);
         }
     }
     //endregion

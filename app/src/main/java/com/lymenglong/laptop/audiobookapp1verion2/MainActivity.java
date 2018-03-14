@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getDataFromIntent();
         initView();
+        ViewCompat.setImportantForAccessibility(getWindow().findViewById(R.id.label_name), ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO);
         initDatabase();
         initObject();
         //get data from json parsing
@@ -211,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
         {
             progressBar.setVisibility(View.GONE);
             GetCursorData();
-            Log.d("MyTagView", "onPostExecute");
+            Log.d("MyTagView", "onPostExecute: "+ getTitle());
         }
     }
     //endregion

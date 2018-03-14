@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
@@ -66,6 +67,7 @@ public class UserInfoActivity extends AppCompatActivity {
 //        getSupportActionBar().setTitle("");
         initToolbar();
         initViews();
+        ViewCompat.setImportantForAccessibility(getWindow().findViewById(R.id.tvToolbar), ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO);
         initObjects();
 //        getDataFromSQLite();
 //        getJSON(URL);
@@ -140,6 +142,18 @@ public class UserInfoActivity extends AppCompatActivity {
         requestQueue.add(stringRequest);
     }
 
+    //This will clear the data and remove your app from memory.
+    //It is equivalent to clear data option under Settings --> Application Manager --> Your App --> Clear data
+    private void deleteAppData() {
+        try {
+            // clearing app data
+            String packageName = getApplicationContext().getPackageName();
+            Runtime runtime = Runtime.getRuntime();
+            runtime.exec("pm clear "+packageName);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } }
 
     private void initToolbar() {
         actionBar = new CustomActionBar();
@@ -232,7 +246,7 @@ public class UserInfoActivity extends AppCompatActivity {
 
     public void showAlertDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Đãng Xuất Tài Khoản");
+//        builder.setTitle("Đãng Xuất Tài Khoản");
         builder.setMessage("Bạn có muốn đăng xuất không?");
         builder.setCancelable(false);
         builder.setPositiveButton("Thoát", new DialogInterface.OnClickListener() {
@@ -253,6 +267,8 @@ public class UserInfoActivity extends AppCompatActivity {
             Toast.makeText(activity, "Đăng Xuất Thành Công", Toast.LENGTH_SHORT).show();
             startActivity(intent);
             finish();
+//            deleteAppData();
+
             }
         });
         AlertDialog alertDialog = builder.create();

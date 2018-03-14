@@ -5,15 +5,21 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.lymenglong.laptop.audiobookapp1verion2.adapter.BookAdapter;
 import com.lymenglong.laptop.audiobookapp1verion2.customize.CustomActionBar;
 import com.lymenglong.laptop.audiobookapp1verion2.databases.DBHelper;
@@ -62,6 +68,8 @@ public class ListBook extends AppCompatActivity{
         setContentView(R.layout.activity_list_chapter);
         getDataFromIntent();
         init();
+        ViewCompat.setImportantForAccessibility(getWindow().findViewById(R.id.tvToolbar), ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        setTitle(titleChapter);
         initDatabase();
         initObject();
     }
@@ -80,11 +88,11 @@ public class ListBook extends AppCompatActivity{
      */
     private void init() {
         actionBar = new CustomActionBar();
-        actionBar.eventToolbar(this, titleChapter, true);
+        actionBar.eventToolbar(this, titleChapter, false);
         listChapter = (RecyclerView) findViewById(R.id.listView);
         progressBar = findViewById(R.id.progressBar);
 
-/*        requestQueue = Volley.newRequestQueue(this);
+    /*    requestQueue = Volley.newRequestQueue(this);
         stringRequest = new StringRequest(Request.Method.POST, URL,
                 new Response.Listener<String>() {
                     @Override
@@ -100,8 +108,8 @@ public class ListBook extends AppCompatActivity{
                     }
                 }
         );
-        requestQueue.add(stringRequest);*/
-
+        requestQueue.add(stringRequest);
+*/
 /*
         databaseHelper = new DatabaseHelper(this);
         chapters = databaseHelper.getListAllChapter(idChapter);
@@ -116,7 +124,12 @@ public class ListBook extends AppCompatActivity{
     private void initDatabase() {
         String DB_NAME = "menu.sqlite";
         int DB_VERSION = 1;
-        String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS book (Id INTEGER PRIMARY KEY, Name VARCHAR(255), CategoryID INTEGER);";
+        String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS book " +
+                "(Id INTEGER PRIMARY KEY, " +
+                "Name VARCHAR(255), " +
+                "CategoryID INTEGER, " +
+                "FileUrl VARCHAR(255), " +
+                "TextContent LONGTEXT);";
         dbHelper = new DBHelper(this,DB_NAME ,null,DB_VERSION);
         //create database
         dbHelper.QueryData(CREATE_TABLE);
@@ -130,7 +143,9 @@ public class ListBook extends AppCompatActivity{
             if(cursor.getInt(2)== idChapter){
                 String name = cursor.getString(1);
                 int id = cursor.getInt(0);
-                list.add(new Book(id,name));
+                String fileUrl = cursor.getString(3);
+                String textContent = cursor.getString(4);
+                list.add(new Book(id,name,textContent,fileUrl));
             }
         }
         cursor.close();
@@ -241,18 +256,24 @@ public class ListBook extends AppCompatActivity{
 
                             bookModel.setTitle(jsonObject.getString("Name").toString());
 
+                            bookModel.setContent(jsonObject.getString("TextContent"));
+
+                            bookModel.setFileUrl(jsonObject.getString("FileUrl"));
+
 
                             books.add(bookModel);
 
                             int Id = bookModel.getId();
                             String Name = bookModel.getTitle();
+                            String TextContent = bookModel.getContent();
+                            String FileUrl = bookModel.getFileUrl();
                             if (list.size()>= books.size()) {
                                 if (!bookModel.getTitle().equals(list.get(i).getTitle())) {
                                     String UPDATE_DATA = "UPDATE book SET Name = '"+Name+"' WHERE Id = '"+Id+"' AND TypeID = '"+idChapter+"'";
                                     dbHelper.QueryData(UPDATE_DATA);
                                 }
                             } else {
-                                String INSERT_DATA = "INSERT INTO book VALUES('"+Id+"','"+Name+"','"+idChapter+"')";
+                                String INSERT_DATA = "INSERT INTO book VALUES('"+Id+"','"+Name+"','"+idChapter+"','"+FileUrl+"','"+TextContent+"')";
                                 dbHelper.QueryData(INSERT_DATA);
                             }
                         }

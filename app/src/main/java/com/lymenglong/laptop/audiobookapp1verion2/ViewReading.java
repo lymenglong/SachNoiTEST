@@ -2,6 +2,7 @@ package com.lymenglong.laptop.audiobookapp1verion2;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.DisplayMetrics;
@@ -55,6 +56,8 @@ public class ViewReading extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_reading);
         getDataFromIntent();
+        setTitle(titleChapter);
+        ViewCompat.setImportantForAccessibility(getWindow().findViewById(R.id.tvToolbar), ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO);
         initView();
         initObject();
         btnFavorite.setOnClickListener(new View.OnClickListener() {

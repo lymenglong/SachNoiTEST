@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -68,6 +69,8 @@ public class ListCategory extends AppCompatActivity{
         setContentView(R.layout.activity_list_chapter);
         getDataFromIntent();
         init();
+        ViewCompat.setImportantForAccessibility(getWindow().findViewById(R.id.tvToolbar), ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        setTitle(titleChapter);
         initDatabase();
         initObject();
     }
