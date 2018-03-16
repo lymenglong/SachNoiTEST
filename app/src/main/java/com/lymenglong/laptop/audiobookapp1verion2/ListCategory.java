@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lymenglong.laptop.audiobookapp1verion2.adapter.CategoryAdapter;
 import com.lymenglong.laptop.audiobookapp1verion2.customize.CustomActionBar;
@@ -41,7 +42,8 @@ public class ListCategory extends AppCompatActivity{
     private ProgressBar progressBar;
     private DBHelper dbHelper;
     private String HttpUrl = "http://20121969.tk/SachNoiBKIC/AllCategoryData.php";
-    private ArrayList<Category> list;
+    private static ArrayList<Category> list;
+    private View imRefresh;
 
 
 
@@ -88,9 +90,10 @@ public class ListCategory extends AppCompatActivity{
      */
     private void init() {
         actionBar = new CustomActionBar();
-        actionBar.eventToolbar(this, titleChapter, false);
+        actionBar.eventToolbar(this, titleChapter, true);
         listChapter = (RecyclerView) findViewById(R.id.listView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        imRefresh = (View) findViewById(R.id.imRefresh);
 
         /*databaseHelper = new DatabaseHelper(this);
         chapters = databaseHelper.getListSmallChapter(idChapter);
@@ -132,9 +135,25 @@ public class ListCategory extends AppCompatActivity{
             LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
             listChapter.setLayoutManager(mLinearLayoutManager);
             listChapter.setAdapter(adapter);
+            // update list
+            GetCursorData();
             /*//get data from json parsing
             new GetHttpResponse(this).execute();*/
-            HttpWebCall(String.valueOf(idChapter));
+            if(list.isEmpty()){
+                HttpWebCall(String.valueOf(idChapter));
+            } else {
+                progressBar.setVisibility(View.GONE);
+            }
+
+            imRefresh.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //todo: check internet connection before be abel to press Button Refresh
+                    HttpWebCall(String.valueOf(idChapter));
+                    Toast.makeText(ListCategory.this, "Refresh", Toast.LENGTH_SHORT).show();
+                }
+            });
+
     }
 
     //region GetHttpResponse all data

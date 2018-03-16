@@ -1,17 +1,22 @@
 package com.lymenglong.laptop.audiobookapp1verion2.customize;
 
 import android.app.Activity;
+import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.lymenglong.laptop.audiobookapp1verion2.ListHome;
 import com.lymenglong.laptop.audiobookapp1verion2.R;
+
+import static android.content.ContentValues.TAG;
 
 
 public class CustomActionBar implements View.OnClickListener{
-    private View imBack, imSearch;
+    private View imBack, imRefresh;
     private TextView tvToolbar;
     private Activity activity;
-
     /**
      * Custom actionbar cho các activity với title và right btn
      * @param activity activity cần dùng bar
@@ -21,22 +26,28 @@ public class CustomActionBar implements View.OnClickListener{
     public void eventToolbar(Activity activity, String text, boolean hasSearch) {
         this.activity = activity;
         imBack = activity.findViewById(R.id.imBack);
-        imSearch = activity.findViewById(R.id.imSearch);
+        imRefresh = activity.findViewById(R.id.imRefresh);
         tvToolbar = (TextView) activity.findViewById(R.id.tvToolbar);
 
         tvToolbar.setText(text);
         if(hasSearch) {
-            imSearch.setVisibility(View.VISIBLE);
+            imRefresh.setVisibility(View.VISIBLE);
         }else {
-            imSearch.setVisibility(View.GONE);
+            imRefresh.setVisibility(View.GONE);
         }
         imBack.setOnClickListener(this);
+        imRefresh.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         if(view == imBack) {
             activity.onBackPressed();
+        }
+        if(view == imRefresh){
+            //todo: refresh list
+//            presenter.RefreshContent(activity);
+
         }
     }
 }

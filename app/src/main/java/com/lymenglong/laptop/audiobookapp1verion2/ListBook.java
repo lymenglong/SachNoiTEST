@@ -59,8 +59,9 @@ public class ListBook extends AppCompatActivity{
     private String ParseResult;
     private HttpParse httpParse = new HttpParse();
     private String HttpURL = "http://20121969.tk/SachNoiBKIC/FilterBookData.php";
-    private ArrayList <Book> list;
+    private static ArrayList<Book> list;
     private ProgressBar progressBar;
+    private View imRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,9 +89,10 @@ public class ListBook extends AppCompatActivity{
      */
     private void init() {
         actionBar = new CustomActionBar();
-        actionBar.eventToolbar(this, titleChapter, false);
+        actionBar.eventToolbar(this, titleChapter, true);
         listChapter = (RecyclerView) findViewById(R.id.listView);
         progressBar = findViewById(R.id.progressBar);
+        imRefresh = (View) findViewById(R.id.imRefresh);
 
     /*    requestQueue = Volley.newRequestQueue(this);
         stringRequest = new StringRequest(Request.Method.POST, URL,
@@ -159,9 +161,23 @@ public class ListBook extends AppCompatActivity{
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         listChapter.setLayoutManager(mLinearLayoutManager);
         listChapter.setAdapter(adapter);
+        //update list
+        GetCursorData();
             /*//get data from json parsing
             new GetHttpResponse(this).execute();*/
-        HttpWebCall(String.valueOf(idChapter));
+        if(list.isEmpty()){
+            HttpWebCall(String.valueOf(idChapter));
+        } else {
+            progressBar.setVisibility(View.GONE);
+        }
+        imRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               // todo: check internet connection before be abel to press Button Refresh
+                HttpWebCall(String.valueOf(idChapter));
+                Toast.makeText(activity, "Refresh", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
@@ -259,7 +275,6 @@ public class ListBook extends AppCompatActivity{
                             bookModel.setContent(jsonObject.getString("TextContent"));
 
                             bookModel.setFileUrl(jsonObject.getString("FileUrl"));
-
 
                             books.add(bookModel);
 

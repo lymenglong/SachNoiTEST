@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     DBHelper dbHelper;
 
-    ArrayList<Home> menuList;
+    private static ArrayList<Home> menuList;
     private ProgressBar progressBar;
 
     @Override
@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         ViewCompat.setImportantForAccessibility(getWindow().findViewById(R.id.label_name), ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_NO);
         initDatabase();
         initObject();
+        GetCursorData();
         //get data from json parsing
         new GetHttpResponse(this).execute();
     }

@@ -80,6 +80,7 @@
     <string name="date_of_birth_dd_mm_yyyy">Date Of Birth (dd/mm/yyyy)</string>
     <string name="register">REGISTER</string>
     <string name="search">search</string>
+    <string name="refresh">refresh</string>
     <string name="back">Quay Lại</string>
     <string name="welcome">Welcome</string>
     <string name="username">Tên đăng nhập</string>

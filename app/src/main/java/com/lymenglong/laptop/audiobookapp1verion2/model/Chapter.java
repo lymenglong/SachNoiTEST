@@ -5,6 +5,8 @@ public class Chapter {
     private int id;
     private String title;
     private String content;
+    private int insertTime;
+    private String fileUrl;
 
     public int getInsertTime() {
         return insertTime;
@@ -14,7 +16,6 @@ public class Chapter {
         this.insertTime = insertTime;
     }
 
-    private String fileUrl;
 
     public Chapter(int id, String title, String content, String fileUrl, int insertTime) {
         this.id = id;
@@ -23,8 +24,6 @@ public class Chapter {
         this.fileUrl = fileUrl;
         this.insertTime = insertTime;
     }
-
-    private int insertTime;
 
     public Chapter(int id, String title, String content, String fileUrl) {
         this.id = id;
@@ -39,7 +38,6 @@ public class Chapter {
     }
 
     public String getFileUrl() {
-
         return fileUrl;
     }
 

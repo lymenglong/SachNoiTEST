@@ -29,9 +29,7 @@ import com.lymenglong.laptop.audiobookapp1verion2.customize.CustomActionBar;
 import com.lymenglong.laptop.audiobookapp1verion2.databases.DBHelper;
 import com.lymenglong.laptop.audiobookapp1verion2.databases.DatabaseHelper;
 import com.lymenglong.laptop.audiobookapp1verion2.http.HttpServicesClass;
-import com.lymenglong.laptop.audiobookapp1verion2.model.BookType;
 import com.lymenglong.laptop.audiobookapp1verion2.model.Chapter;
-import com.lymenglong.laptop.audiobookapp1verion2.model.Home;
 import com.lymenglong.laptop.audiobookapp1verion2.model.Session;
 
 import org.json.JSONArray;
@@ -46,6 +44,7 @@ import java.util.ArrayList;
 
 public class ListHome extends AppCompatActivity{
     private RecyclerView listChapter;
+    private View imRefresh;
     private ArrayList<Chapter> chapters;
     private HomeAdapter adapter;
     private HistoryAdapter historyAdapter;
@@ -61,15 +60,13 @@ public class ListHome extends AppCompatActivity{
     private StringRequest stringRequest;
     private RequestQueue requestQueue;
 
-
-
-//    private static final String getHistoryURL = "http://20121969.tk/audiobook/books/getAllBooks.php";
+    //    private static final String getHistoryURL = "http://20121969.tk/audiobook/books/getAllBooks.php";
     private static final String getHistoryURL = "http://20121969.tk/audiobook/books/getHistory.php";
     private static final String getFavoriteURL = "http://20121969.tk/audiobook/books/getFavorite.php";
     private ProgressBar progressBar;
     private DBHelper dbHelper;
-    private ArrayList <Chapter> list;
-    private String HttpUrl = "http://20121969.tk/SachNoiBKIC/AllBookTypeData.php";
+    private static ArrayList <Chapter> list;
+    private static final String HttpUrl_AllBookTypeData = "http://20121969.tk/SachNoiBKIC/AllBookTypeData.php";
 
 
     @Override
@@ -88,15 +85,17 @@ public class ListHome extends AppCompatActivity{
     private void initDatabase() {
         String DB_NAME = "menu.sqlite";
         int DB_VERSION = 1;
-        String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS booktype(Id INTEGER PRIMARY KEY, Name VARCHAR(255));";
+        String CREATE_TABLE_BOOKTYPE = "CREATE TABLE IF NOT EXISTS booktype(Id INTEGER PRIMARY KEY, Name VARCHAR(255));";
+        String CREATE_TABLE_HISTORY = "CREATE TABLE IF NOT EXISTS history(IdUser INTEGER PRIMARY KEY, IdBook INTEGER, Name VARCHAR(255));";
         dbHelper = new DBHelper(this,DB_NAME ,null,DB_VERSION);
         //create database
-        dbHelper.QueryData(CREATE_TABLE);
+        dbHelper.QueryData(CREATE_TABLE_BOOKTYPE);
 
     }
 
-    private void GetCursorData() {
-        Cursor cursor = dbHelper.GetData("SELECT * FROM booktype");
+    private void GetCursorData(String tableName) {
+        list.clear();
+        Cursor cursor = dbHelper.GetData("SELECT * FROM '"+tableName+"'");
         while (cursor.moveToNext()){
             String name = cursor.getString(1);
             int id = cursor.getInt(0);
@@ -114,8 +113,20 @@ public class ListHome extends AppCompatActivity{
             LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
             listChapter.setLayoutManager(mLinearLayoutManager);
             listChapter.setAdapter(adapter);
+            GetCursorData(TableSwitched(idHome));
             //get data from json parsing
-            new GetHttpResponse(this).execute();
+            if(list.isEmpty()){
+                new GetHttpResponse(this).execute();
+            } else {
+                progressBar.setVisibility(View.GONE);
+            }
+            imRefresh.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(activity, "Refresh", Toast.LENGTH_SHORT).show();
+                    new ListHome.GetHttpResponse(activity).execute();
+                }
+            });
         }
         if(idHome == 2){ //lich su
             stringRequest = new StringRequest(Request.Method.POST, getHistoryURL,
@@ -170,6 +181,27 @@ public class ListHome extends AppCompatActivity{
         else return;
     }
 
+
+    private String HttpUrlSwitched(int id){
+        String pathUrl = null;
+        switch (id){
+            case 1: // list book
+                pathUrl = HttpUrl_AllBookTypeData;
+                break;
+        }
+        return pathUrl;
+    }
+    private String TableSwitched(int id){
+        String tableName = null;
+        switch (id){
+            case 1: // list book
+                tableName = "booktype";
+                break;
+        }
+        return tableName;
+    }
+
+
     //region JSON parse class started from here.
     private class GetHttpResponse extends AsyncTask<Void, Void, Void>
     {
@@ -177,7 +209,7 @@ public class ListHome extends AppCompatActivity{
 
         String JSonResult;
 
-        ArrayList<BookType> bookTypes;
+        ArrayList<Chapter> tempArray;
 
         public GetHttpResponse(Context context)
         {
@@ -194,7 +226,7 @@ public class ListHome extends AppCompatActivity{
         protected Void doInBackground(Void... arg0)
         {
             // Passing HTTP URL to HttpServicesClass Class.
-            HttpServicesClass httpServicesClass = new HttpServicesClass(HttpUrl);
+            HttpServicesClass httpServicesClass = new HttpServicesClass(HttpUrlSwitched(idHome));
             try
             {
                 httpServicesClass.ExecutePostRequest();
@@ -212,35 +244,29 @@ public class ListHome extends AppCompatActivity{
 
                             JSONObject jsonObject;
 
-                            BookType bookTypeModel;
+                            Chapter tempModel;
 //                            studentList = new ArrayList<Student>();
-                            bookTypes = new ArrayList<BookType>();
+                            tempArray = new ArrayList<>();
 
                             for(int i=0; i<jsonArray.length(); i++)
                             {
 //                                student = new Student();
-                                bookTypeModel = new BookType();
+                                tempModel = new Chapter();
 
                                 jsonObject = jsonArray.getJSONObject(i);
 
-                                // Adding Student Id TO IdList Array.
-//                                IdList.add(jsonObject.getString("Id").toString());
-                                bookTypeModel.setId(Integer.parseInt(jsonObject.getString("Id")));
+                                tempModel.setId(Integer.parseInt(jsonObject.getString("Id")));
+                                tempModel.setTitle(jsonObject.getString("Name").toString());
+                                tempArray.add(tempModel);
 
-                                //Adding Student Name.
-//                                student.StudentName = jsonObject.getString("Name").toString();
-                                bookTypeModel.setTitle(jsonObject.getString("Name").toString());
-                                bookTypes.add(bookTypeModel);
-                                int Id = bookTypeModel.getId();
-                                String Name = bookTypeModel.getTitle();
-                                if (list.size()>= bookTypes.size()) {
-                                    if (!bookTypeModel.getTitle().equals(list.get(i).getTitle())) {
-                                        String UPDATE_DATA = "UPDATE booktype SET Name = '"+Name+"' WHERE Id = '"+Id+"'";
-                                        dbHelper.QueryData(UPDATE_DATA);
-                                    }
+                                int Id = tempModel.getId();
+                                String Name = tempModel.getTitle();
+
+                                if (list.size()>= tempArray.size()) {
+                                    SetUpdateTableData(i, Id, Name, TableSwitched(idHome));
                                 } else {
-                                    String INSERT_DATA = "INSERT INTO booktype VALUES('"+Id+"','"+Name+"')";
-                                    dbHelper.QueryData(INSERT_DATA);
+                                    SetInsertTableData(Id,Name,TableSwitched(idHome));
+
                                 }
                             }
                         }
@@ -267,8 +293,20 @@ public class ListHome extends AppCompatActivity{
         protected void onPostExecute(Void result)
         {
             progressBar.setVisibility(View.GONE);
-            GetCursorData();
+            GetCursorData(TableSwitched(idHome));
             Log.d("MyTagView", "onPostExecute: "+titleHome);
+        }
+    }
+
+    private void SetInsertTableData(int id, String name, String tableName) {
+        String INSERT_DATA = "INSERT INTO '"+tableName+"' VALUES('"+id+"','"+name+"')";
+        dbHelper.QueryData(INSERT_DATA);
+    }
+
+    private void SetUpdateTableData(int i, int Id, String Name, String tableName) {
+        if (!list.get(i).getTitle().equals(Name)) {
+            String UPDATE_DATA = "UPDATE '"+tableName+"' SET Name = '"+Name+"' WHERE Id = '"+Id+"';";
+            dbHelper.QueryData(UPDATE_DATA);
         }
     }
     //endregion
@@ -357,8 +395,9 @@ public class ListHome extends AppCompatActivity{
         session = new Session(activity);
         requestQueue = Volley.newRequestQueue(activity);
         progressBar = (ProgressBar)findViewById(R.id.progressBar);
+        imRefresh = (View) findViewById(R.id.imRefresh);
         actionBar = new CustomActionBar();
-        actionBar.eventToolbar(this, titleHome, false);
+        actionBar.eventToolbar(this, titleHome, true);
         listChapter = (RecyclerView) findViewById(R.id.listView);
     }
 

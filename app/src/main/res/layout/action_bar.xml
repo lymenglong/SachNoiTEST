@@ -38,16 +38,16 @@
             android:textColor="@color/white"
             android:textSize="20sp" />
         <ImageView
-            android:id="@+id/imSearch"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:src="@drawable/search"
+            android:id="@+id/imRefresh"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@android:drawable/stat_notify_sync_noanim"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
-            android:visibility="gone"
-            android:contentDescription="@string/search"
+            android:visibility="visible"
+            android:contentDescription="@string/refresh"
             />
 
     </RelativeLayout>
