@@ -103,16 +103,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="left"
-                    android:text="00:00" />
+                    android:textSize="18sp"
+                    android:gravity="start"
+                    android:text="@string/time" />
 
                 <TextView
                     android:id="@+id/text_total_duration_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="right"
-                    android:text="00:00" />
+                    android:textSize="18sp"
+                    android:gravity="end"
+                    android:text="@string/time" />
             </LinearLayout>
         </LinearLayout>
 

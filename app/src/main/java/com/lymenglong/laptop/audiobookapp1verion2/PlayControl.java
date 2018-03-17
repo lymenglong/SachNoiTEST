@@ -1,11 +1,14 @@
 package com.lymenglong.laptop.audiobookapp1verion2;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -51,6 +54,7 @@ public class PlayControl extends AppCompatActivity {
     // Handler to update UI timer, progress bar etc,.
     private Handler mHandler = new Handler();
     private int intCurrentPosition = 0;
+    private int targetPossition;
     private int intSoundMax = 0;
     private int seekForwardTime = 10000; // 10 seconds
     private int seekBackwardTime = 10000; // 10 seconds
@@ -58,13 +62,17 @@ public class PlayControl extends AppCompatActivity {
     private TextView songCurrentDurationLabel;
     private String getFileUrlChapter,  getContentChapter, getTitleChapter;
     private int getIdChapter, getInsertTime;
+    private ProgressDialog progressDialog;
+
+    private boolean initialStage = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_control);
         initDataFromIntent();
-        setTitle("Audio Player");
+        setTitle(getTitleChapter);
         initCheckBookUrl(); //finish activity when getFileUrlChapter is empty
         initToolbar();
         initView();
@@ -73,6 +81,61 @@ public class PlayControl extends AppCompatActivity {
         intListener();
 
     }
+
+
+
+class Player extends AsyncTask<String, Void, Boolean> {
+    @Override
+    protected Boolean doInBackground(String... strings) {
+        Boolean prepared = false;
+        try {
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(strings[0]);
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    initialStage = true;
+//                    mediaPlayer.stop();
+//                    mediaPlayer.reset();
+                }
+            });
+            mediaPlayer.prepare();
+            intSoundMax = mediaPlayer.getDuration();
+            prepared = true;
+
+        } catch (Exception e) {
+            Log.e("MyAudioStreamingApp", e.getMessage());
+            prepared = false;
+        }
+
+        return prepared;
+    }
+
+    @Override
+    protected void onPostExecute(Boolean aBoolean) {
+        super.onPostExecute(aBoolean);
+
+        if (progressDialog.isShowing()) {
+            progressDialog.cancel();
+        }
+        mediaPlayer.start();
+        initialStage = false;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        progressDialog.setMessage("Buffering...");
+        progressDialog.show();
+    }
+}
+
+
+
+
+
+
+
 
     private void postHistoryDataToServer() {
 
@@ -171,7 +234,7 @@ public class PlayControl extends AppCompatActivity {
 
     private void initPrepareMedia() {
         if (getFileUrlChapter != null) {
-            mediaPlayer.reset();
+            /*mediaPlayer.reset();
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             try {
                 mediaPlayer.setDataSource(getFileUrlChapter);
@@ -184,7 +247,8 @@ public class PlayControl extends AppCompatActivity {
                 });
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
+            new Player().execute(getFileUrlChapter);
         }
     }
 
@@ -193,7 +257,9 @@ public class PlayControl extends AppCompatActivity {
         requestQueueHistory = Volley.newRequestQueue(activity);
         requestQueueFavorite = Volley.newRequestQueue(activity);
         mediaPlayer= new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         session = new Session(activity);
+        progressDialog = new ProgressDialog(activity);
     }
 
     View.OnClickListener onClickListener  = new View.OnClickListener() {
@@ -249,9 +315,10 @@ public class PlayControl extends AppCompatActivity {
 
     private void forwardMedia() {
         intCurrentPosition = mediaPlayer.getCurrentPosition();
-        if(intCurrentPosition + seekForwardTime <= mediaPlayer.getDuration()){
+        targetPossition = intCurrentPosition + seekForwardTime;
+        if(targetPossition < intSoundMax){
             // forward song
-            mediaPlayer.seekTo(intCurrentPosition + seekForwardTime);
+            mediaPlayer.seekTo(targetPossition);
         }else{
             // forward to end position
             mediaPlayer.seekTo(mediaPlayer.getDuration());
@@ -274,7 +341,9 @@ public class PlayControl extends AppCompatActivity {
         songProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mediaPlayer.seekTo(i);
+                if(b){
+                    mediaPlayer.seekTo(i);
+                }
             }
 
             @Override
@@ -297,6 +366,7 @@ public class PlayControl extends AppCompatActivity {
 
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
+            mSeekbarUpdateHandler.removeCallbacks(mUpdateSeekbar);
         }
     }
 
@@ -304,6 +374,8 @@ public class PlayControl extends AppCompatActivity {
         if (!mediaPlayer.isPlaying()) {
             if (mediaPlayer!=null) {
                 mediaPlayer.start();
+                songProgressBar.setMax(mediaPlayer.getDuration());
+                mSeekbarUpdateHandler.postDelayed(mUpdateSeekbar, 500);
                 if(mediaPlayer.getCurrentPosition()<getInsertTime){
                     mediaPlayer.seekTo(getInsertTime);
                 }
@@ -323,6 +395,16 @@ public class PlayControl extends AppCompatActivity {
             }
         }
     }
+
+
+    private Handler mSeekbarUpdateHandler = new Handler();
+    private Runnable mUpdateSeekbar = new Runnable() {
+        @Override
+        public void run() {
+            songProgressBar.setProgress(mediaPlayer.getCurrentPosition());
+            mSeekbarUpdateHandler.postDelayed(this, 50);
+        }
+    };
 
 
     public void initProgressSeekBar(){
@@ -356,7 +438,7 @@ public class PlayControl extends AppCompatActivity {
 
     private void initToolbar() {
         actionBar = new CustomActionBar();
-        actionBar.eventToolbar(this, "Audio Player", false);
+        actionBar.eventToolbar(this, getTitleChapter, false);
     }
 
     private void initView() {

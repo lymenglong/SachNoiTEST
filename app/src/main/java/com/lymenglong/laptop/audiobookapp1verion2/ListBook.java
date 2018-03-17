@@ -1,6 +1,7 @@
 package com.lymenglong.laptop.audiobookapp1verion2;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -62,6 +63,7 @@ public class ListBook extends AppCompatActivity{
     private static ArrayList<Book> list;
     private ProgressBar progressBar;
     private View imRefresh;
+    private ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,8 +191,7 @@ public class ListBook extends AppCompatActivity{
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-
-//                pDialog = ProgressDialog.show(ShowCategoryActivity.this,"Loading Data",null,true,true);
+                pDialog = ProgressDialog.show(activity,"Loading Data","Please wait",true,true);
             }
 
             @Override
@@ -198,7 +199,7 @@ public class ListBook extends AppCompatActivity{
 
                 super.onPostExecute(httpResponseMsg);
 
-//                pDialog.dismiss();
+                pDialog.dismiss();
 
                 //Storing Complete JSon Object into String Variable.
                 FinalJSonObject = httpResponseMsg ;
@@ -310,7 +311,7 @@ public class ListBook extends AppCompatActivity{
         @Override
         protected void onPostExecute(Void result)
         {
-
+            pDialog.dismiss();
             progressBar.setVisibility(View.GONE);
             GetCursorData();
             Log.d("MyTagView", "onPostExecute: "+ titleChapter);

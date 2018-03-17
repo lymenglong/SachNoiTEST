@@ -91,5 +91,6 @@
     <string name="add_favorite">Ghim vào yêu thích</string>
     <string name="already_a_member_login">Đã có tài khoản, Đăng nhập</string>
     <string name="hint_home_screen">Giao diện chủ</string>
+    <string name="time">00:00</string>
 
 </resources>
