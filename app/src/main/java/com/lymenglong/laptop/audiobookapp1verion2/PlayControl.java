@@ -220,7 +220,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
         getIdChapter = getIntent().getIntExtra("idChapter",-1);
         getTitleChapter = getIntent().getStringExtra("titleChapter");
         getContentChapter = getIntent().getStringExtra("content");
-        getPauseTime = getIntent().getIntExtra("PauseTime", 0);
+        getPauseTime = getIntent().getIntExtra("pauseTime", 0);
     }
 
     private void initPrepareMedia() {

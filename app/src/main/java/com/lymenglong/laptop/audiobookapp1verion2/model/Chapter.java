@@ -5,8 +5,7 @@ public class Chapter {
     private int id;
     private String title;
     private String content;
-    private int insertTime;
-    private String fileUrl;
+    private int pauseTime;
 
     public int getInsertTime() {
         return insertTime;
@@ -16,13 +15,43 @@ public class Chapter {
         this.insertTime = insertTime;
     }
 
+    private int insertTime;
+    private String fileUrl;
+    private int categoryId;
 
-    public Chapter(int id, String title, String content, String fileUrl, int insertTime) {
+    public int getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public int getPauseTime() {
+        return pauseTime;
+    }
+
+    public void setPauseTime(int pauseTime) {
+        this.pauseTime = pauseTime;
+    }
+
+
+    public Chapter(int id, String title, String content, String fileUrl, int pauseTime) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.fileUrl = fileUrl;
+        this.pauseTime = pauseTime;
+    }
+
+    public Chapter(int id, String title, String content, int pauseTime, int insertTime, String fileUrl, int categoryId) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.pauseTime = pauseTime;
         this.insertTime = insertTime;
+        this.fileUrl = fileUrl;
+        this.categoryId = categoryId;
     }
 
     public Chapter(int id, String title, String content, String fileUrl) {

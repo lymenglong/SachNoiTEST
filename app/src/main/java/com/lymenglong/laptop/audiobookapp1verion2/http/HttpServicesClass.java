@@ -1,9 +1,5 @@
 package com.lymenglong.laptop.audiobookapp1verion2.http;
 
-/**
- * Created by Juned on 3/4/2017.
- */
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;

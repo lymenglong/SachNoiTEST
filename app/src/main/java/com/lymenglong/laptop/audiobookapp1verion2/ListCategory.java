@@ -147,7 +147,7 @@ public class ListCategory extends AppCompatActivity{
                 public void onClick(View v) {
                     //todo: check internet connection before be abel to press Button Refresh
                     HttpWebCall(String.valueOf(idChapter));
-                    Toast.makeText(ListCategory.this, "Refresh", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(ListCategory.this, "Refresh", Toast.LENGTH_SHORT).show();
                 }
             });
 

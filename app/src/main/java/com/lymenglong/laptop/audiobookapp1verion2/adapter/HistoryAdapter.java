@@ -24,7 +24,7 @@ public class HistoryAdapter extends RecyclerView.Adapter {
     private ArrayList<Chapter> chapters;
     private Activity activity;
     private View view;
-    private int getIdChapter, getInsertTime;
+    private int getIdChapter, getPauseTime;
     private String getTitleChapter,getContentChapter, getFileUrlChapter;
 
     public HistoryAdapter(Activity activity, ArrayList<Chapter> chapters) {
@@ -80,7 +80,7 @@ public class HistoryAdapter extends RecyclerView.Adapter {
                     getTitleChapter = chapters.get(getAdapterPosition()).getTitle();
                     getContentChapter = chapters.get(getAdapterPosition()).getContent();
                     getFileUrlChapter = chapters.get(getAdapterPosition()).getFileUrl();
-                    getInsertTime = chapters.get(getAdapterPosition()).getInsertTime();
+                    getPauseTime = chapters.get(getAdapterPosition()).getPauseTime();
                     showAlertDialog();
                 }
             }
@@ -124,7 +124,7 @@ public class HistoryAdapter extends RecyclerView.Adapter {
                 intent.putExtra("titleChapter", getTitleChapter);
                 intent.putExtra("content", getContentChapter);
                 intent.putExtra("fileUrl", getFileUrlChapter);
-                intent.putExtra("InsertTime", getInsertTime);
+                intent.putExtra("pauseTime", getPauseTime);
                 activity.startActivity(intent);
             }
         });

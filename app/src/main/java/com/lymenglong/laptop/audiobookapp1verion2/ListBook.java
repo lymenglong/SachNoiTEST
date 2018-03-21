@@ -55,15 +55,10 @@ public class ListBook extends AppCompatActivity{
     private StringRequest stringRequest;
     private RequestQueue requestQueue;
     private DBHelper dbHelper;
-    private String FinalJSonObject;
-    private HashMap<String, String> ResultHash = new HashMap<>();
-    private String ParseResult;
-    private HttpParse httpParse = new HttpParse();
-    private String HttpURL = "http://20121969.tk/SachNoiBKIC/FilterBookData.php";
     private static ArrayList<Book> list;
     private ProgressBar progressBar;
     private View imRefresh;
-    private ProgressDialog pDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +91,7 @@ public class ListBook extends AppCompatActivity{
         progressBar = findViewById(R.id.progressBar);
         imRefresh = (View) findViewById(R.id.imRefresh);
 
+        //region Get list Book Old Code
     /*    requestQueue = Volley.newRequestQueue(this);
         stringRequest = new StringRequest(Request.Method.POST, URL,
                 new Response.Listener<String>() {
@@ -122,6 +118,7 @@ public class ListBook extends AppCompatActivity{
         listChapter.setLayoutManager(mLinearLayoutManager);
         listChapter.setAdapter(adapter);
 */
+        //endregion
 
     }
 
@@ -140,6 +137,40 @@ public class ListBook extends AppCompatActivity{
 
     }
 
+    private void initObject() {
+        //set adapter to list view
+        SetAdapterToListView();
+        //update list
+        GetCursorData();
+
+        //region get data from json parsing
+        if(list.isEmpty()){
+            HttpWebCall(String.valueOf(idChapter));
+        } else {
+            progressBar.setVisibility(View.GONE);
+        }
+        //endregion
+
+        //To refresh list when click button refresh
+        imRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // todo: check internet connection before be abel to press Button Refresh
+                HttpWebCall(String.valueOf(idChapter));
+//                Toast.makeText(activity, "Refresh", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void SetAdapterToListView() {
+        list = new ArrayList<>();
+        adapter = new BookAdapter(ListBook.this, list);
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
+        listChapter.setLayoutManager(mLinearLayoutManager);
+        listChapter.setAdapter(adapter);
+    }
+
+    //region Method to get data for database
     private void GetCursorData() {
         list.clear();
         Cursor cursor = dbHelper.GetData("SELECT * FROM book");
@@ -155,36 +186,17 @@ public class ListBook extends AppCompatActivity{
         cursor.close();
         adapter.notifyDataSetChanged();
         dbHelper.close();
-
     }
-
-    private void initObject() {
-        list = new ArrayList<>();
-        adapter = new BookAdapter(ListBook.this, list);
-        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
-        listChapter.setLayoutManager(mLinearLayoutManager);
-        listChapter.setAdapter(adapter);
-        //update list
-        GetCursorData();
-            /*//get data from json parsing
-            new GetHttpResponse(this).execute();*/
-        if(list.isEmpty()){
-            HttpWebCall(String.valueOf(idChapter));
-        } else {
-            progressBar.setVisibility(View.GONE);
-        }
-        imRefresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               // todo: check internet connection before be abel to press Button Refresh
-                HttpWebCall(String.valueOf(idChapter));
-                Toast.makeText(activity, "Refresh", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+    //endregion
 
 
-    //Method to show current record Current Selected Record
+    //region Method to show current record Current Selected Record
+    private ProgressDialog pDialog;
+    private String FinalJSonObject;
+    private HashMap<String, String> ResultHash = new HashMap<>();
+    private String ParseResult;
+    private HttpParse httpParse = new HttpParse();
+    private String HttpURL = "http://20121969.tk/SachNoiBKIC/FilterBookData.php";
     public void HttpWebCall(final String PreviousListViewClickedItem){
 
         class HttpWebCallFunction extends AsyncTask<String,Void,String> {
@@ -225,9 +237,9 @@ public class ListBook extends AppCompatActivity{
 
         httpWebCallFunction.execute(PreviousListViewClickedItem);
     }
+    //endregion
 
-
-    // Parsing Complete JSON Object.
+    //region Parsing Complete JSON Object.
     private class GetHttpResponse extends AsyncTask<Void, Void, Void>
     {
         public Context context;
@@ -319,9 +331,7 @@ public class ListBook extends AppCompatActivity{
 
         }
     }
-
-
-
+    //endregion
 
     //region getJSON old code
     private void getJSON(final String urlWebService) {
