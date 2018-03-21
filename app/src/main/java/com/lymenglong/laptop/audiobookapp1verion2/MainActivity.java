@@ -1,5 +1,7 @@
 package com.lymenglong.laptop.audiobookapp1verion2;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -18,19 +20,14 @@ import com.lymenglong.laptop.audiobookapp1verion2.adapter.MainAdapter;
 import com.lymenglong.laptop.audiobookapp1verion2.databases.DBHelper;
 import com.lymenglong.laptop.audiobookapp1verion2.databases.DatabaseHelper;
 import com.lymenglong.laptop.audiobookapp1verion2.http.HttpServicesClass;
+import com.lymenglong.laptop.audiobookapp1verion2.model.Chapter;
 import com.lymenglong.laptop.audiobookapp1verion2.model.Home;
 
-import org.apache.http.client.methods.HttpOptions;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -39,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private Home homeModel;
     private MainAdapter mainAdapter;
     private DatabaseHelper databaseHelper;
+    private Activity activity = MainActivity.this;
     private static final String URL = "http://20121969.tk/audiobook/books/getAllBooks.php";
 
 
@@ -46,8 +44,9 @@ public class MainActivity extends AppCompatActivity {
 
     DBHelper dbHelper;
 
-    private static ArrayList<Home> menuList;
+    private static ArrayList<Chapter> menuList;
     private ProgressBar progressBar;
+    private ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private void getDataFromIntent() {
         if (getIntent().getBooleanExtra("EXIT", false)) {
             finish();
-            Intent intent = new Intent(this, LoginActivity2.class);
+            Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         }
     }
@@ -96,11 +95,11 @@ public class MainActivity extends AppCompatActivity {
         while (cursor.moveToNext()){
             String name = cursor.getString(1);
             int id = cursor.getInt(0);
-            menuList.add(new Home(id,name));
+            menuList.add(new Chapter(id,name));
         }
         cursor.close();
         mainAdapter.notifyDataSetChanged();
-
+        dbHelper.close();
     }
 
     private void initObject() {
@@ -132,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute()
         {
             super.onPreExecute();
+            pDialog = ProgressDialog.show(activity, "Load Data","Please wait...", true,true);
         }
 
         @Override
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 //Adding Student Name.
 //                                student.StudentName = jsonObject.getString("Name").toString();
-                                homeModel.setTitle(jsonObject.getString("Name").toString());
+                                homeModel.setTitle(jsonObject.getString("Name"));
                                 home.add(homeModel);
                                 int Id = homeModel.getId();
                                 String Name = homeModel.getTitle();
@@ -212,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result)
         {
+            pDialog.dismiss();
             progressBar.setVisibility(View.GONE);
             GetCursorData();
             Log.d("MyTagView", "onPostExecute: "+ getTitle());
@@ -221,9 +222,10 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+//region GetJSON start from here
 
+/*
 
-    //region GetJSON start from here
     private void getJSON(final String urlWebService) {
 
         class GetJSON extends AsyncTask<Void, Void, String> {
@@ -279,6 +281,8 @@ public class MainActivity extends AppCompatActivity {
         homeList.setLayoutManager(mLinearLayoutManager);
         homeList.setAdapter(mainAdapter);
     }
-    //endregion
+
+*/
+//endregion
 
 }

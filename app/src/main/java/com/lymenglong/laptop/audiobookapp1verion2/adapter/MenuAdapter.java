@@ -16,12 +16,12 @@ import com.lymenglong.laptop.audiobookapp1verion2.model.Chapter;
 import java.util.ArrayList;
 
 
-public class HomeAdapter extends RecyclerView.Adapter {
+public class MenuAdapter extends RecyclerView.Adapter {
     private ArrayList<Chapter> chapters;
     private Activity activity;
     private View view;
 
-    public HomeAdapter(Activity activity, ArrayList<Chapter> chapters) {
+    public MenuAdapter(Activity activity, ArrayList<Chapter> chapters) {
         this.chapters = chapters;
         this.activity = activity;
     }

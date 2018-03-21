@@ -1,19 +1,15 @@
 package com.lymenglong.laptop.audiobookapp1verion2;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -40,9 +36,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class LoginActivity2 extends AppCompatActivity{
+public class LoginActivity extends AppCompatActivity{
 
-    private final AppCompatActivity activity = LoginActivity2.this;
+    private final AppCompatActivity activity = LoginActivity.this;
 
     private AppCompatTextView textViewLinkRegister;
     private RequestQueue requestQueue;
@@ -163,7 +159,7 @@ public class LoginActivity2 extends AppCompatActivity{
         textViewLinkRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intentRegister = new Intent(getApplicationContext(), RegisterActivity3.class);
+                Intent intentRegister = new Intent(getApplicationContext(), RegisterActivity.class);
                 startActivity(intentRegister);
                 activity.finish();
             }
@@ -242,7 +238,7 @@ public class LoginActivity2 extends AppCompatActivity{
         requestQueue = Volley.newRequestQueue(this);
         session = new Session(this);
         if(session.loggedin()){
-            startActivity(new Intent(LoginActivity2.this,MainActivity.class));
+            startActivity(new Intent(LoginActivity.this,MainActivity.class));
             finish();
         }
     }

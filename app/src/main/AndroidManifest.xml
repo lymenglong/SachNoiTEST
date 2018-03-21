@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ListHome"
+            android:name=".ListMenu"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity android:name=".ViewReading" />
         <activity
@@ -42,7 +42,7 @@
             android:name=".ListBook"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".LoginActivity2"
+            android:name=".LoginActivity"
             android:label="@string/hint_login"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -52,7 +52,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RegisterActivity3"
+            android:name=".RegisterActivity"
             android:label="@string/hint_register"
             android:screenOrientation="portrait">
             <intent-filter>

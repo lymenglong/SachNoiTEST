@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://C:\Users\LapTop\Documents\SachNoiTEST\AudioBookApp1Version3.iml" filepath="C:\Users\LapTop\Documents\SachNoiTEST\AudioBookApp1Version3.iml" />
-      <module fileurl="file://$PROJECT_DIR$/SachNoiTEST.iml" filepath="$PROJECT_DIR$/SachNoiTEST.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AudioBookApp1Version3.iml" filepath="$PROJECT_DIR$/AudioBookApp1Version3.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\Users\LapTop\Documents\SachNoiTEST\app\app.iml" filepath="C:\Users\LapTop\Documents\SachNoiTEST\app\app.iml" />
     </modules>
   </component>
 </project>

@@ -28,9 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class RegisterActivity3 extends AppCompatActivity implements View.OnClickListener {
+public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private final AppCompatActivity activity = RegisterActivity3.this;
+    private final AppCompatActivity activity = RegisterActivity.this;
 
     private NestedScrollView nestedScrollView;
 
@@ -133,7 +133,7 @@ public class RegisterActivity3 extends AppCompatActivity implements View.OnClick
                 break;
 
             case R.id.appCompatTextViewLoginLink:
-                Intent intentLogin = new Intent(activity, LoginActivity2.class);
+                Intent intentLogin = new Intent(activity, LoginActivity.class);
                 startActivity(intentLogin);
                 activity.finish();
                 break;
@@ -176,7 +176,7 @@ public class RegisterActivity3 extends AppCompatActivity implements View.OnClick
                     JSONObject jsonObject = new JSONObject(response);
                     if(jsonObject.names().get(0).equals("success")){
                         Toast.makeText(getApplicationContext(),"SUCCESS "+jsonObject.getString("success"),Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(getApplicationContext(),LoginActivity2.class));
+                        startActivity(new Intent(getApplicationContext(),LoginActivity.class));
                         activity.finish();
                     }else {
                         Toast.makeText(getApplicationContext(), "Error " +jsonObject.getString("error"), Toast.LENGTH_SHORT).show();

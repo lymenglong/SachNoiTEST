@@ -9,20 +9,20 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.lymenglong.laptop.audiobookapp1verion2.ListHome;
+import com.lymenglong.laptop.audiobookapp1verion2.ListMenu;
 import com.lymenglong.laptop.audiobookapp1verion2.R;
-import com.lymenglong.laptop.audiobookapp1verion2.model.Home;
+import com.lymenglong.laptop.audiobookapp1verion2.model.Chapter;
 
 import java.util.ArrayList;
 
 
 public class MainAdapter extends RecyclerView.Adapter {
-    private ArrayList<Home> homes;
+    private ArrayList<Chapter> chapters;
     private Activity activity;
     private View view;
 
-    public MainAdapter(Activity activity, ArrayList<Home> homes) {
-        this.homes = homes;
+    public MainAdapter(Activity activity, ArrayList<Chapter> chapters) {
+        this.chapters = chapters;
         this.activity = activity;
     }
 
@@ -38,7 +38,7 @@ public class MainAdapter extends RecyclerView.Adapter {
         if (holder instanceof HomeHolder) {
             HomeHolder homeHolder = (HomeHolder) holder;
 
-            homeHolder.name.setText(homes.get(position).getTitle());
+            homeHolder.name.setText(chapters.get(position).getTitle());
         }
 
     }
@@ -50,7 +50,7 @@ public class MainAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        return homes.size();
+        return chapters.size();
     }
 
     class HomeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -68,9 +68,9 @@ public class MainAdapter extends RecyclerView.Adapter {
         @Override
         public void onClick(View view) {
             if(view == itemView){
-                Intent intent = new Intent(activity, ListHome.class);
-                intent.putExtra("idHome", homes.get(getAdapterPosition()).getId());
-                intent.putExtra("titleHome", homes.get(getAdapterPosition()).getTitle());
+                Intent intent = new Intent(activity, ListMenu.class);
+                intent.putExtra("idHome", chapters.get(getAdapterPosition()).getId());
+                intent.putExtra("titleHome", chapters.get(getAdapterPosition()).getTitle());
                 activity.startActivity(intent);
             }
         }

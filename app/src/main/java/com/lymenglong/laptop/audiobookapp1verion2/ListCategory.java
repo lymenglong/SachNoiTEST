@@ -1,5 +1,6 @@
 package com.lymenglong.laptop.audiobookapp1verion2;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -58,11 +59,7 @@ public class ListCategory extends AppCompatActivity{
     String ParseResult ;
     HashMap<String,String> ResultHash = new HashMap<>();
     String FinalJSonObject ;
-
-
-
-
-
+    private ProgressDialog pDialog;
 
 
     @Override
@@ -126,7 +123,7 @@ public class ListCategory extends AppCompatActivity{
         }
         cursor.close();
         adapter.notifyDataSetChanged();
-
+        dbHelper.close();
     }
 
     private void initObject() {
@@ -269,7 +266,7 @@ public class ListCategory extends AppCompatActivity{
             protected void onPreExecute() {
                 super.onPreExecute();
 
-//                pDialog = ProgressDialog.show(ShowCategoryActivity.this,"Loading Data",null,true,true);
+                pDialog = ProgressDialog.show(ListCategory.this,"Loading Data","Please wait...",true,true);
             }
 
             @Override
@@ -277,7 +274,7 @@ public class ListCategory extends AppCompatActivity{
 
                 super.onPostExecute(httpResponseMsg);
 
-//                pDialog.dismiss();
+                pDialog.dismiss();
 
                 //Storing Complete JSon Object into String Variable.
                 FinalJSonObject = httpResponseMsg ;

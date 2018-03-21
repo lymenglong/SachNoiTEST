@@ -3,7 +3,6 @@ package com.lymenglong.laptop.audiobookapp1verion2;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.view.Window;
@@ -42,7 +41,7 @@ public class SplashScreen extends AppCompatActivity {
                 //Finish the splash activity so it can't be returned to.
                 SplashScreen.this.finish();
                 // Create an Intent that will start the main activity.
-                Intent mainIntent = new Intent(SplashScreen.this, LoginActivity2.class);
+                Intent mainIntent = new Intent(SplashScreen.this, LoginActivity.class);
                 startActivity(mainIntent);
                 //overridePendingTransition(R.anim.bottom_in,R.anim.top_out);
             }

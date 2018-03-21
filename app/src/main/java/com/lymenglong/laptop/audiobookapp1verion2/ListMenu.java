@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,7 +23,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.lymenglong.laptop.audiobookapp1verion2.adapter.HomeAdapter;
+import com.lymenglong.laptop.audiobookapp1verion2.adapter.MenuAdapter;
 import com.lymenglong.laptop.audiobookapp1verion2.adapter.FavoriteAdapter;
 import com.lymenglong.laptop.audiobookapp1verion2.adapter.HistoryAdapter;
 import com.lymenglong.laptop.audiobookapp1verion2.customize.CustomActionBar;
@@ -42,20 +43,20 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class ListHome extends AppCompatActivity{
+public class ListMenu extends AppCompatActivity{
     private RecyclerView listChapter;
     private View imRefresh;
     private ArrayList<Chapter> chapters;
-    private HomeAdapter adapter;
+    private MenuAdapter adapter;
     private HistoryAdapter historyAdapter;
     private FavoriteAdapter favoriteAdapter;
     private CustomActionBar actionBar;
     private DatabaseHelper databaseHelper;
     private String titleHome;
-    private int idHome;
+    private int idMenu;
     private TextView tvStory;
     private Chapter chapterModel;
-    private Activity activity = ListHome.this;
+    private Activity activity = ListMenu.this;
     private Session session;
     private StringRequest stringRequest;
     private RequestQueue requestQueue;
@@ -67,6 +68,7 @@ public class ListHome extends AppCompatActivity{
     private DBHelper dbHelper;
     private static ArrayList <Chapter> list;
     private static final String HttpUrl_AllBookTypeData = "http://20121969.tk/SachNoiBKIC/AllBookTypeData.php";
+    private static final String HttpUrl_FilterHistoryData = "http://20121969.tk/SachNoiBKIC/FilterHistoryData.php";
 
 
     @Override
@@ -86,10 +88,11 @@ public class ListHome extends AppCompatActivity{
         String DB_NAME = "menu.sqlite";
         int DB_VERSION = 1;
         String CREATE_TABLE_BOOKTYPE = "CREATE TABLE IF NOT EXISTS booktype(Id INTEGER PRIMARY KEY, Name VARCHAR(255));";
-        String CREATE_TABLE_HISTORY = "CREATE TABLE IF NOT EXISTS history(IdUser INTEGER PRIMARY KEY, IdBook INTEGER, Name VARCHAR(255));";
+        String CREATE_TABLE_HISTORY = "CREATE TABLE IF NOT EXISTS history(IdUser INTEGER PRIMARY KEY, IdBook INTEGER, InsertTime INTEGER, PauseTime INTEGER);";
         dbHelper = new DBHelper(this,DB_NAME ,null,DB_VERSION);
         //create database
         dbHelper.QueryData(CREATE_TABLE_BOOKTYPE);
+        dbHelper.QueryData(CREATE_TABLE_HISTORY);
 
     }
 
@@ -103,32 +106,33 @@ public class ListHome extends AppCompatActivity{
         }
         cursor.close();
         adapter.notifyDataSetChanged();
+        dbHelper.close();
 
     }
 
     private void initObject() {
-        if (idHome == 1) {
+        imRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(activity, "Refresh", Toast.LENGTH_SHORT).show();
+                new ListMenu.GetHttpResponse(activity).execute();
+            }
+        });
+        if (idMenu == 1) {
             list = new ArrayList<>();
-            adapter = new HomeAdapter(ListHome.this, list);
+            adapter = new MenuAdapter(ListMenu.this, list);
             LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
             listChapter.setLayoutManager(mLinearLayoutManager);
             listChapter.setAdapter(adapter);
-            GetCursorData(TableSwitched(idHome));
+            GetCursorData(TableSwitched(idMenu));
             //get data from json parsing
             if(list.isEmpty()){
                 new GetHttpResponse(this).execute();
             } else {
                 progressBar.setVisibility(View.GONE);
             }
-            imRefresh.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(activity, "Refresh", Toast.LENGTH_SHORT).show();
-                    new ListHome.GetHttpResponse(activity).execute();
-                }
-            });
         }
-        if(idHome == 2){ //lich su
+        if(idMenu == 2){ //lich su
             stringRequest = new StringRequest(Request.Method.POST, getHistoryURL,
                     new Response.Listener<String>() {
                         @Override
@@ -147,7 +151,7 @@ public class ListHome extends AppCompatActivity{
             );
             requestQueue.add(stringRequest);
         }
-        if(idHome== 3) { // yeu thich
+        if(idMenu == 3) { // yeu thich
             stringRequest = new StringRequest(Request.Method.POST, getFavoriteURL,
                     new Response.Listener<String>() {
                         @Override
@@ -165,18 +169,19 @@ public class ListHome extends AppCompatActivity{
             );
             requestQueue.add(stringRequest);
         }
-        if(idHome == 4){ // tai khoan
+        if(idMenu == 4){ // tai khoan
             Intent intent  = new Intent(this, UserInfoActivity.class);
             this.finish();
             this.startActivity(intent);
         }
-        if(idHome == 5){ // huong dan
+        if(idMenu == 5){ // huong dan
             Intent intent  = new Intent(this, HelpActivity.class);
             this.finish();
             this.startActivity(intent);
         }
-        if(idHome == 0){ // thoát
-            activity.finish();
+        if(idMenu == 6){ // thoát
+            ActivityCompat.finishAffinity(this);
+            System.exit(0);
         }
         else return;
     }
@@ -226,7 +231,7 @@ public class ListHome extends AppCompatActivity{
         protected Void doInBackground(Void... arg0)
         {
             // Passing HTTP URL to HttpServicesClass Class.
-            HttpServicesClass httpServicesClass = new HttpServicesClass(HttpUrlSwitched(idHome));
+            HttpServicesClass httpServicesClass = new HttpServicesClass(HttpUrlSwitched(idMenu));
             try
             {
                 httpServicesClass.ExecutePostRequest();
@@ -263,9 +268,9 @@ public class ListHome extends AppCompatActivity{
                                 String Name = tempModel.getTitle();
 
                                 if (list.size()>= tempArray.size()) {
-                                    SetUpdateTableData(i, Id, Name, TableSwitched(idHome));
+                                    SetUpdateTableData(i, Id, Name, TableSwitched(idMenu));
                                 } else {
-                                    SetInsertTableData(Id,Name,TableSwitched(idHome));
+                                    SetInsertTableData(Id,Name,TableSwitched(idMenu));
 
                                 }
                             }
@@ -293,7 +298,7 @@ public class ListHome extends AppCompatActivity{
         protected void onPostExecute(Void result)
         {
             progressBar.setVisibility(View.GONE);
-            GetCursorData(TableSwitched(idHome));
+            GetCursorData(TableSwitched(idMenu));
             Log.d("MyTagView", "onPostExecute: "+titleHome);
         }
     }
@@ -315,16 +320,16 @@ public class ListHome extends AppCompatActivity{
     //region initObject Before changed
    /* private void initObject() {
 
-        if(idHome == 1){ //the loai sach
+        if(idMenu == 1){ //the loai sach
             databaseHelper = new DatabaseHelper(this);
-            chapters = databaseHelper.getListChapter(idHome);
-            adapter = new HomeAdapter(ListHome.this, chapters);
+            chapters = databaseHelper.getListChapter(idMenu);
+            adapter = new MenuAdapter(ListMenu.this, chapters);
             LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
             listChapter.setLayoutManager(mLinearLayoutManager);
             listChapter.setAdapter(adapter);
         }
 
-        if(idHome == 2){ //lich su
+        if(idMenu == 2){ //lich su
             stringRequest = new StringRequest(Request.Method.POST, getHistoryURL,
                     new Response.Listener<String>() {
                         @Override
@@ -343,7 +348,7 @@ public class ListHome extends AppCompatActivity{
             );
             requestQueue.add(stringRequest);
         }
-        if(idHome== 3) { // yeu thich
+        if(idMenu== 3) { // yeu thich
             stringRequest = new StringRequest(Request.Method.POST, getFavoriteURL,
                     new Response.Listener<String>() {
                         @Override
@@ -361,17 +366,17 @@ public class ListHome extends AppCompatActivity{
             );
             requestQueue.add(stringRequest);
         }
-        if(idHome == 4){ // tai khoan
+        if(idMenu == 4){ // tai khoan
             Intent intent  = new Intent(this, UserInfoActivity.class);
             this.finish();
             this.startActivity(intent);
         }
-        if(idHome == 5){ // huong dan
+        if(idMenu == 5){ // huong dan
             Intent intent  = new Intent(this, HelpActivity.class);
             this.finish();
             this.startActivity(intent);
         }
-        if(idHome == 0){ // thoát
+        if(idMenu == 0){ // thoát
 //            activity.finish();
         }
         else return;
@@ -385,7 +390,7 @@ public class ListHome extends AppCompatActivity{
      */
     private void getDataFromIntent() {
         titleHome = getIntent().getStringExtra("titleHome");
-        idHome = getIntent().getIntExtra("idHome", -1);
+        idMenu = getIntent().getIntExtra("idHome", -1);
     }
 
     /**
@@ -417,6 +422,7 @@ public class ListHome extends AppCompatActivity{
                 super.onPostExecute(s);
                 try {
                     getListHistoryFromJSON(s);
+                    progressBar.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -480,6 +486,7 @@ public class ListHome extends AppCompatActivity{
                 super.onPostExecute(s);
                 try {
                     getListFavoriteFromJSON(s);
+                    progressBar.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

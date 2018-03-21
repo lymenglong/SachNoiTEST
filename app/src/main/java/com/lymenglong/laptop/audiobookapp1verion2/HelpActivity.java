@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 
-import com.lymenglong.laptop.audiobookapp1verion2.adapter.HomeAdapter;
+import com.lymenglong.laptop.audiobookapp1verion2.adapter.MenuAdapter;
 import com.lymenglong.laptop.audiobookapp1verion2.customize.CustomActionBar;
 import com.lymenglong.laptop.audiobookapp1verion2.databases.DatabaseHelper;
 import com.lymenglong.laptop.audiobookapp1verion2.model.Chapter;
@@ -22,7 +22,7 @@ public class HelpActivity extends AppCompatActivity {
     private TextView tvReadFile;
     private RecyclerView listChapter;
     private ArrayList<Chapter> chapters;
-    private HomeAdapter adapter;
+    private MenuAdapter adapter;
     private CustomActionBar actionBar;
     private DatabaseHelper databaseHelper;
     private String titleHome;

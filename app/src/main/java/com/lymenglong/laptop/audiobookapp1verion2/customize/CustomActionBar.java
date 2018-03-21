@@ -1,16 +1,10 @@
 package com.lymenglong.laptop.audiobookapp1verion2.customize;
 
 import android.app.Activity;
-import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.lymenglong.laptop.audiobookapp1verion2.ListHome;
 import com.lymenglong.laptop.audiobookapp1verion2.R;
-
-import static android.content.ContentValues.TAG;
 
 
 public class CustomActionBar implements View.OnClickListener{

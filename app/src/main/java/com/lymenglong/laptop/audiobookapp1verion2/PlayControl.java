@@ -28,7 +28,6 @@ import com.lymenglong.laptop.audiobookapp1verion2.model.Session;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,16 +54,17 @@ public class PlayControl extends AppCompatActivity {
     private Handler mHandler = new Handler();
     private int intCurrentPosition = 0;
     private int targetPossition;
-    private int intSoundMax = 0;
-    private int seekForwardTime = 10000; // 10 seconds
-    private int seekBackwardTime = 10000; // 10 seconds
+    private int intSoundMax;
+    private int seekForwardTime = 5000; //5 seconds
+    private int seekBackwardTime = 5000; // 5 seconds
     private TextView songTotalDurationLabel;
     private TextView songCurrentDurationLabel;
     private String getFileUrlChapter,  getContentChapter, getTitleChapter;
-    private int getIdChapter, getInsertTime;
+    private int getIdChapter, getPauseTime;
     private ProgressDialog progressDialog;
 
     private boolean initialStage = true;
+    private Runnable runnable;
 
 
     @Override
@@ -100,7 +100,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
                 }
             });
             mediaPlayer.prepare();
-            intSoundMax = mediaPlayer.getDuration();
+//            songProgressBar.setMax(intSoundMax);
             prepared = true;
 
         } catch (Exception e) {
@@ -118,6 +118,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
         if (progressDialog.isShowing()) {
             progressDialog.cancel();
         }
+
         mediaPlayer.start();
         initialStage = false;
     }
@@ -129,13 +130,6 @@ class Player extends AsyncTask<String, Void, Boolean> {
         progressDialog.show();
     }
 }
-
-
-
-
-
-
-
 
     private void postHistoryDataToServer() {
 
@@ -175,8 +169,6 @@ class Player extends AsyncTask<String, Void, Boolean> {
 
         requestQueueHistory.add(requestHistory);
     }
-
-
     private void postFavoriteDataToServer() {
 
         requestFavorite = new StringRequest(Request.Method.POST, favoriteURL, new Response.Listener<String>() {
@@ -216,7 +208,6 @@ class Player extends AsyncTask<String, Void, Boolean> {
         requestQueueFavorite.add(requestFavorite);
     }
 
-
     private void initCheckBookUrl() {
         if (getFileUrlChapter.isEmpty()) {
             Toast.makeText(activity, "Lỗi, Dữ liệu chưa được cấp nhật", Toast.LENGTH_SHORT).show();
@@ -229,7 +220,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
         getIdChapter = getIntent().getIntExtra("idChapter",-1);
         getTitleChapter = getIntent().getStringExtra("titleChapter");
         getContentChapter = getIntent().getStringExtra("content");
-        getInsertTime = getIntent().getIntExtra("InsertTime", 0);
+        getPauseTime = getIntent().getIntExtra("PauseTime", 0);
     }
 
     private void initPrepareMedia() {
@@ -245,6 +236,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
                         intSoundMax = mp.getDuration();
                     }
                 });
+                mediaPlayer.prepare();
             } catch (IOException e) {
                 e.printStackTrace();
             }*/
@@ -262,9 +254,11 @@ class Player extends AsyncTask<String, Void, Boolean> {
         progressDialog = new ProgressDialog(activity);
     }
 
+    //bat su kien khi kich button
     View.OnClickListener onClickListener  = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            //region Switch Button
             switch (view.getId()){
                 case R.id.btn_add_favorite:
                     postFavoriteDataToServer();
@@ -291,6 +285,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
                     backwardMedia();
                     break;
             }
+            //endregion
         }
     };
 
@@ -319,6 +314,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
         if(targetPossition < intSoundMax){
             // forward song
             mediaPlayer.seekTo(targetPossition);
+            Log.d("MyTagView", "forwardMedia: "+ targetPossition);
         }else{
             // forward to end position
             mediaPlayer.seekTo(mediaPlayer.getDuration());
@@ -343,6 +339,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 if(b){
                     mediaPlayer.seekTo(i);
+                    seekBar.setProgress(i);
                 }
             }
 
@@ -353,7 +350,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+//                seekBar.setProgress(mediaPlayer.getCurrentPosition());
             }
         });
     }
@@ -374,10 +371,9 @@ class Player extends AsyncTask<String, Void, Boolean> {
         if (!mediaPlayer.isPlaying()) {
             if (mediaPlayer!=null) {
                 mediaPlayer.start();
-                songProgressBar.setMax(mediaPlayer.getDuration());
-                mSeekbarUpdateHandler.postDelayed(mUpdateSeekbar, 500);
-                if(mediaPlayer.getCurrentPosition()<getInsertTime){
-                    mediaPlayer.seekTo(getInsertTime);
+                mSeekbarUpdateHandler.postDelayed(mUpdateSeekbar, 1000);
+                if(mediaPlayer.getCurrentPosition()< getPauseTime){
+                    mediaPlayer.seekTo(getPauseTime);
                 }
 //                Toast.makeText(activity, "Playback Started From Server",
                 if(mediaPlayer.isPlaying()){
@@ -395,7 +391,6 @@ class Player extends AsyncTask<String, Void, Boolean> {
             }
         }
     }
-
 
     private Handler mSeekbarUpdateHandler = new Handler();
     private Runnable mUpdateSeekbar = new Runnable() {

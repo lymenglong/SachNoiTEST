@@ -154,6 +154,7 @@ public class ListBook extends AppCompatActivity{
         }
         cursor.close();
         adapter.notifyDataSetChanged();
+        dbHelper.close();
 
     }
 
@@ -249,7 +250,7 @@ public class ListBook extends AppCompatActivity{
         {
             try
             {
-                if(FinalJSonObject != null)
+                if(FinalJSonObject != null && !FinalJSonObject.equals("No Results Found.")) //When no data, it will return "No Results Found." Value to String JSONObject.
                 {
                     JSONArray jsonArray = null;
 
