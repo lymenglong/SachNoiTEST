@@ -286,6 +286,8 @@ public class ListBook extends AppCompatActivity{
 
                             bookModel.setTitle(jsonObject.getString("Name").toString());
 
+                            bookModel.setCategoryId(Integer.parseInt(jsonObject.getString("CategoryId")));
+
                             bookModel.setContent(jsonObject.getString("TextContent"));
 
                             bookModel.setFileUrl(jsonObject.getString("FileUrl"));
@@ -293,12 +295,18 @@ public class ListBook extends AppCompatActivity{
                             books.add(bookModel);
 
                             int Id = bookModel.getId();
+                            int CategoryId = bookModel.getCategoryId();
                             String Name = bookModel.getTitle();
                             String TextContent = bookModel.getContent();
                             String FileUrl = bookModel.getFileUrl();
                             if (list.size()>= books.size()) {
                                 if (!bookModel.getTitle().equals(list.get(i).getTitle())) {
-                                    String UPDATE_DATA = "UPDATE book SET Name = '"+Name+"' WHERE Id = '"+Id+"' AND TypeID = '"+idChapter+"'";
+                                    String UPDATE_DATA = "UPDATE book SET " +
+                                                            "Name = '"+Name+"', " +
+                                                            "CategoryId = '"+CategoryId+"', " +
+                                                            "FileUrl = '"+FileUrl+"' ," +
+                                                            "TextContent = '"+TextContent+"' " +
+                                                                "WHERE Id = '"+Id+"'";
                                     dbHelper.QueryData(UPDATE_DATA);
                                 }
                             } else {

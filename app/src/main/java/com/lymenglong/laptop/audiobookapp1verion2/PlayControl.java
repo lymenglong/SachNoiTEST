@@ -40,7 +40,7 @@ public class PlayControl extends AppCompatActivity {
     private Activity activity = PlayControl.this;
     private Thread seekBarThread;
     private SeekBar songProgressBar;
-    private int lastPlayDuration = 0;
+    private static int lastPlayDuration = 0;
 
 
     private RequestQueue requestQueueHistory, requestQueueFavorite;
@@ -161,8 +161,8 @@ class Player extends AsyncTask<String, Void, Boolean> {
                 HashMap<String,String> hashMap = new HashMap<String, String>();
                 hashMap.put("IdBook", String.valueOf(getIdChapter));
                 hashMap.put("IdUser", session.getUserIdLoggedIn());
-                hashMap.put("InsertTime",String.valueOf(lastPlayDuration));
-                hashMap.put("PauseTime ","3210");
+                hashMap.put("InsertTime","12354");
+                hashMap.put("PauseTime ",String.valueOf(lastPlayDuration));
                 return hashMap;
             }
         };

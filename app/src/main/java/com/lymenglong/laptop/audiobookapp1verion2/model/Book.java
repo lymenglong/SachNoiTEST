@@ -8,6 +8,16 @@ public class Book {
     private Boolean status; //when status is true, it means that you select audio book
     private String FileUrl;
 
+    public int getCategoryId() {
+        return CategoryId;
+    }
+
+    public void setCategoryId(int categoryId) {
+        CategoryId = categoryId;
+    }
+
+    private int CategoryId;
+
     public String getFileUrl() {
         return FileUrl;
     }

@@ -104,7 +104,7 @@ public class ListCategory extends AppCompatActivity{
     private void initDatabase() {
         String DB_NAME = "menu.sqlite";
         int DB_VERSION = 1;
-        String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS category(Id INTEGER PRIMARY KEY, Name VARCHAR(255), TypeID INTEGER);";
+        String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS category(Id INTEGER, Name VARCHAR(255), TypeID INTEGER);";
         dbHelper = new DBHelper(this,DB_NAME ,null,DB_VERSION);
         //create database
         dbHelper.QueryData(CREATE_TABLE);
