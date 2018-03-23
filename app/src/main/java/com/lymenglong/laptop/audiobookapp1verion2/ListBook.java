@@ -299,19 +299,19 @@ public class ListBook extends AppCompatActivity{
                             String Name = bookModel.getTitle();
                             String TextContent = bookModel.getContent();
                             String FileUrl = bookModel.getFileUrl();
-                            if (list.size()>= books.size()) {
-                                if (!bookModel.getTitle().equals(list.get(i).getTitle())) {
-                                    String UPDATE_DATA = "UPDATE book SET " +
-                                                            "Name = '"+Name+"', " +
-                                                            "CategoryId = '"+CategoryId+"', " +
-                                                            "FileUrl = '"+FileUrl+"' ," +
-                                                            "TextContent = '"+TextContent+"' " +
-                                                                "WHERE Id = '"+Id+"'";
-                                    dbHelper.QueryData(UPDATE_DATA);
-                                }
-                            } else {
-                                String INSERT_DATA = "INSERT INTO book VALUES('"+Id+"','"+Name+"','"+idChapter+"','"+FileUrl+"','"+TextContent+"')";
+                            String INSERT_DATA = null;
+                            try {
+                                INSERT_DATA = "INSERT INTO book VALUES('"+Id+"','"+Name+"','"+idChapter+"','"+FileUrl+"','"+TextContent+"')";
                                 dbHelper.QueryData(INSERT_DATA);
+                            } catch (Exception e) {
+                                Log.d("MyTagView", "SetInsertTableData: failed "+INSERT_DATA);
+                                String UPDATE_DATA = "UPDATE book SET " +
+                                        "Name = '"+Name+"', " +
+                                        "CategoryId = '"+CategoryId+"', " +
+                                        "FileUrl = '"+FileUrl+"' ," +
+                                        "TextContent = '"+TextContent+"' " +
+                                        "WHERE Id = '"+Id+"'";
+                                dbHelper.QueryData(UPDATE_DATA);
                             }
                         }
                     }

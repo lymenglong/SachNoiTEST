@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -234,7 +235,6 @@ public class ListMenu extends AppCompatActivity{
                 ActivityCompat.finishAffinity(this);
                 System.exit(0);
                 break;
-
         }
     }
 
@@ -370,15 +370,19 @@ public class ListMenu extends AppCompatActivity{
         String INSERT_DATA = null;
         switch (tableName){
             case "booktype":
-                INSERT_DATA = "INSERT INTO '"+tableName+"' VALUES('"+arrayModel.getId()+"','"+arrayModel.getTitle()+"')";
-                dbHelper.QueryData(INSERT_DATA);
+                try {
+                    INSERT_DATA = "INSERT INTO '"+tableName+"' VALUES('"+arrayModel.getId()+"','"+arrayModel.getTitle()+"')";
+                    dbHelper.QueryData(INSERT_DATA);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
             case "history":
-                INSERT_DATA = "INSERT INTO '"+tableName+"' VALUES(" +
-                        "'"+arrayModel.getId()+"'," +
-                        "'"+session.getUserIdLoggedIn()+"'," +
-                        "'"+arrayModel.getInsertTime()+"'," +
-                        "'"+arrayModel.getPauseTime()+"')";
+                    INSERT_DATA = "INSERT INTO '"+tableName+"' VALUES(" +
+                            "'"+arrayModel.getId()+"'," +
+                            "'"+session.getUserIdLoggedIn()+"'," +
+                            "'"+arrayModel.getInsertTime()+"'," +
+                            "'"+arrayModel.getPauseTime()+"')";
                 /*INSERT_DATA = "INSERT INTO '"+tableName+"' VALUES(" +
                         "'"+arrayModel.getId()+"'," +
                         "'"+session.getUserIdLoggedIn()+"'," +
@@ -387,7 +391,7 @@ public class ListMenu extends AppCompatActivity{
                         "'"+arrayModel.getTitle()+"'," +
                         "'"+arrayModel.getFileUrl()+"'," +
                         "'"+arrayModel.getContent()+"')";*/
-                dbHelper.QueryData(INSERT_DATA);
+                    dbHelper.QueryData(INSERT_DATA);
                 try {
                     INSERT_DATA = "INSERT INTO book VALUES (" +
                             "'"+arrayModel.getId()+"'," +
@@ -397,8 +401,7 @@ public class ListMenu extends AppCompatActivity{
                             "'"+arrayModel.getContent()+"');";
                     dbHelper.QueryData(INSERT_DATA);
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.d("MyTagView", "SetInsertTableData: failed");
+                    Log.d("MyTagView", "SetInsertTableData: failed "+INSERT_DATA);
                 }
                 break;
         }
@@ -410,21 +413,29 @@ public class ListMenu extends AppCompatActivity{
         switch (tableName){
             case "booktype":
                 if (!list.get(i).getTitle().equals(arrayModel.getTitle())) {
-                    UPDATE_DATA = "UPDATE '"+tableName+"' SET Name = '"+arrayModel.getTitle()+"' WHERE Id = '"+arrayModel.getId()+"';";
-                    dbHelper.QueryData(UPDATE_DATA);
+                    try {
+                        UPDATE_DATA = "UPDATE '"+tableName+"' SET Name = '"+arrayModel.getTitle()+"' WHERE Id = '"+arrayModel.getId()+"';";
+                        dbHelper.QueryData(UPDATE_DATA);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             case "history":
-                    UPDATE_DATA = "UPDATE history, book SET " +
-                            "history.InsertTime = '"+arrayModel.getInsertTime()+"', " +
-                            "history.PauseTime = '"+arrayModel.getPauseTime()+"' " +
-                            "book.Name = '"+arrayModel.getTitle()+"', " +
-                            "book.CategoryId = '"+arrayModel.getCategoryId()+"', " +
-                            "book.FileUrl = '"+arrayModel.getFileUrl()+"', " +
-                            "book.TextContent = '"+arrayModel.getContent()+"' " +
+                try {
+                    UPDATE_DATA = "UPDATE history SET " +
+                            "InsertTime = '"+arrayModel.getInsertTime()+"', " +
+                            "PauseTime = '"+arrayModel.getPauseTime()+"' " +
+//                            "book.Name = '"+arrayModel.getTitle()+"', " +
+//                            "book.CategoryId = '"+arrayModel.getCategoryId()+"', " +
+//                            "book.FileUrl = '"+arrayModel.getFileUrl()+"', " +
+//                            "book.TextContent = '"+arrayModel.getContent()+"' " +
                             "WHERE " +
-                                "history.IdBook = book.Id";
+                                "IdBook = '"+arrayModel.getId()+"' AND IdUser = '"+session.getUserIdLoggedIn()+"';";
                     dbHelper.QueryData(UPDATE_DATA);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
         }
 
@@ -582,6 +593,26 @@ public class ListMenu extends AppCompatActivity{
 
                         Chapter tempModel;
                         tempArray = new ArrayList<>();
+                        Cursor cursor = null;
+
+                        if(idMenu == 2) // if list of database in sqlite on phone we delete all data in history table in sqlite phone
+                            cursor = dbHelper.GetData("SELECT * FROM history, book WHERE history.IdBook = book.Id");
+                            ArrayList<Chapter> arrayList = new ArrayList<>();
+                            while (cursor.moveToNext()){
+                                int userId = cursor.getInt(0);
+                                int historybookId = cursor.getInt(1);
+                                int insertTime = cursor.getInt(2);
+                                int pauseTime = cursor.getInt(3);
+                                int bookId = cursor.getInt(4);
+                                String bookName = cursor.getString(5);
+                                int categoryId = cursor.getInt(6);
+                                String content = cursor.getString(8);
+                                String fileURL = cursor.getString(7);
+                                arrayList.add(new Chapter(bookId,bookName,content,pauseTime,insertTime,fileURL,categoryId));
+                            }
+                            if (arrayList.size() > jsonArray.length()){
+                                dbHelper.QueryData("DELETE FROM '"+TableSwitched(idMenu)+"'");
+                            }
 
                         for(int i=0; i<jsonArray.length(); i++)
                         {
@@ -600,10 +631,9 @@ public class ListMenu extends AppCompatActivity{
                             tempArray.add(tempModel);
 
                             try {
-                                SetUpdateTableData(i, tempModel, TableSwitched(idMenu));
-                            } catch (Exception e) {
-                                e.printStackTrace();
                                 SetInsertTableData(tempModel,TableSwitched(idMenu));
+                            } catch (Exception e) {
+                                SetUpdateTableData(i, tempModel, TableSwitched(idMenu));
                             }
 
 

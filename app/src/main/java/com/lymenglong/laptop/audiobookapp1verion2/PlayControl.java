@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,6 +30,7 @@ import com.lymenglong.laptop.audiobookapp1verion2.model.Session;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +38,7 @@ public class PlayControl extends AppCompatActivity {
 
 
     private Button btnPlay, btnStop, btnPause, btnForward, btnBackward, btnNext, btnPrev, btnFavorite;
-    private MediaPlayer mediaPlayer;
+    private MediaPlayer mediaPlayer = new MediaPlayer();
     private CustomActionBar actionBar;
     private Activity activity = PlayControl.this;
     private Thread seekBarThread;
@@ -82,24 +85,24 @@ public class PlayControl extends AppCompatActivity {
 
     }
 
-
-
-class Player extends AsyncTask<String, Void, Boolean> {
+    class Player extends AsyncTask<String, Void, Boolean> {
     @Override
     protected Boolean doInBackground(String... strings) {
         Boolean prepared = false;
         try {
             mediaPlayer.reset();
-            mediaPlayer.setDataSource(strings[0]);
+            mediaPlayer.setDataSource(PlayControl.this, Uri.parse(strings[0]));
+//            mediaPlayer.prepareAsync();
+            mediaPlayer.prepare();
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
                     initialStage = true;
-//                    mediaPlayer.stop();
-//                    mediaPlayer.reset();
+                    mediaPlayer.stop();
+                    mediaPlayer.reset();
                 }
             });
-            mediaPlayer.prepare();
+
 //            songProgressBar.setMax(intSoundMax);
             prepared = true;
 
@@ -120,6 +123,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
         }
 
         mediaPlayer.start();
+
         initialStage = false;
     }
 
@@ -225,7 +229,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
 
     private void initPrepareMedia() {
         if (getFileUrlChapter != null) {
-            /*mediaPlayer.reset();
+/*            mediaPlayer.reset();
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             try {
                 mediaPlayer.setDataSource(getFileUrlChapter);
@@ -248,7 +252,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
     private void initObject() {
         requestQueueHistory = Volley.newRequestQueue(activity);
         requestQueueFavorite = Volley.newRequestQueue(activity);
-        mediaPlayer= new MediaPlayer();
+//        mediaPlayer= new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         session = new Session(activity);
         progressDialog = new ProgressDialog(activity);
@@ -282,7 +286,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
                     forwardMedia();
                     break;
                 case R.id.btn_backward:
-                    backwardMedia();
+                    RewindMedia();
                     break;
             }
             //endregion
@@ -296,7 +300,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
 
     }
 
-    private void backwardMedia() {
+    private void RewindMedia() {
         intCurrentPosition = mediaPlayer.getCurrentPosition();
         // check if seekBackward time is greater than 0 sec
         if(intCurrentPosition - seekBackwardTime >= 0){
