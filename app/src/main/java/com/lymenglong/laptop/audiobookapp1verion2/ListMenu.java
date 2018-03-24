@@ -621,13 +621,9 @@ public class ListMenu extends AppCompatActivity{
 
                             jsonObject = jsonArray.getJSONObject(i);
 
-                            tempModel.setId(Integer.parseInt(jsonObject.getString("Id")));
-                            tempModel.setTitle(jsonObject.getString("Name"));
-                            tempModel.setCategoryId(Integer.parseInt(jsonObject.getString("CategoryId")));
-                            tempModel.setPauseTime(Integer.parseInt(jsonObject.getString("PauseTime")));
-                            tempModel.setInsertTime(Integer.parseInt(jsonObject.getString("InsertTime")));
-                            tempModel.setContent(jsonObject.getString("TextContent"));
-                            tempModel.setFileUrl(jsonObject.getString("FileUrl"));
+                            //return tempModel value from jsonObject
+                            SetTempModel(tempModel,jsonObject,TableSwitched(idMenu));
+
                             tempArray.add(tempModel);
 
                             try {
@@ -662,6 +658,30 @@ public class ListMenu extends AppCompatActivity{
             Log.d("MyTagView", "onPostExecute: "+ titleHome);
 
         }
+    }
+
+    private Chapter SetTempModel(Chapter tempModel, JSONObject jsonObject, String tableSwitched) throws JSONException {
+        switch (tableSwitched){
+            case "history":
+                tempModel.setId(Integer.parseInt(jsonObject.getString("Id")));
+                tempModel.setTitle(jsonObject.getString("Name"));
+                tempModel.setCategoryId(Integer.parseInt(jsonObject.getString("CategoryId")));
+                tempModel.setPauseTime(Integer.parseInt(jsonObject.getString("PauseTime")));
+                tempModel.setInsertTime(Integer.parseInt(jsonObject.getString("InsertTime")));
+                tempModel.setContent(jsonObject.getString("TextContent"));
+                tempModel.setFileUrl(jsonObject.getString("FileUrl"));
+                break;
+            case "favorite":
+                tempModel.setId(Integer.parseInt(jsonObject.getString("Id")));
+                tempModel.setTitle(jsonObject.getString("Name"));
+                tempModel.setCategoryId(Integer.parseInt(jsonObject.getString("CategoryId")));
+                tempModel.setPauseTime(Integer.parseInt(jsonObject.getString("Status")));
+                tempModel.setInsertTime(Integer.parseInt(jsonObject.getString("InsertTime")));
+                tempModel.setContent(jsonObject.getString("TextContent"));
+                tempModel.setFileUrl(jsonObject.getString("FileUrl"));
+                break;
+        }
+        return tempModel;
     }
     //endregion
     /**

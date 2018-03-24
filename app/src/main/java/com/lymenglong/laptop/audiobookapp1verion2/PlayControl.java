@@ -7,7 +7,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,12 +24,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.lymenglong.laptop.audiobookapp1verion2.customize.CustomActionBar;
+import com.lymenglong.laptop.audiobookapp1verion2.http.HttpParse;
 import com.lymenglong.laptop.audiobookapp1verion2.model.Session;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +37,7 @@ public class PlayControl extends AppCompatActivity {
 
 
     private Button btnPlay, btnStop, btnPause, btnForward, btnBackward, btnNext, btnPrev, btnFavorite;
-    private MediaPlayer mediaPlayer = new MediaPlayer();
+    private final MediaPlayer mediaPlayer = new MediaPlayer();
     private CustomActionBar actionBar;
     private Activity activity = PlayControl.this;
     private Thread seekBarThread;
@@ -121,8 +120,8 @@ public class PlayControl extends AppCompatActivity {
         if (progressDialog.isShowing()) {
             progressDialog.cancel();
         }
-
-        mediaPlayer.start();
+        playMedia();
+//        mediaPlayer.start();
 
         initialStage = false;
     }
@@ -135,6 +134,63 @@ public class PlayControl extends AppCompatActivity {
     }
 }
 
+    //region Method to Update History
+    String HttpUrlUpdateHistory = "http://20121969.tk/SachNoiBKIC/UpdateHistory.php";
+    ProgressDialog pDialog;
+    String finalResult ;
+    HashMap<String,String> hashMap = new HashMap<>();
+    HttpParse httpParse = new HttpParse();
+    public void HistoryRecordUpdate(final String S_IdUser,
+                                    final String S_IdBook,
+                                    final String S_InsertTime,
+                                    final String S_PauseTime,
+                                    final String S_HttpURL){
+
+        class HistoryRecordUpdateClass extends AsyncTask<String,Void,String> {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+
+//                pDialog = ProgressDialog.show(PlayControl.this,"Loading Data",null,true,true);
+            }
+
+            @Override
+            protected void onPostExecute(String httpResponseMsg) {
+
+                super.onPostExecute(httpResponseMsg);
+
+//                pDialog.dismiss();
+
+//                Toast.makeText(getApplicationContext(),httpResponseMsg.toString(), Toast.LENGTH_LONG).show();
+
+            }
+
+            @Override
+            protected String doInBackground(String... params) {
+
+                hashMap.put("IdUser",params[0]);
+
+                hashMap.put("IdBook",params[1]);
+
+                hashMap.put("InsertTime",params[2]);
+
+                hashMap.put("PauseTime",params[3]);
+
+//                finalResult = httpParse.postRequest(hashMap, HttpUrlUpdateHistory);
+                finalResult = httpParse.postRequest(hashMap, params[4]);
+
+                return finalResult;
+            }
+        }
+
+        HistoryRecordUpdateClass historyRecordUpdateClass = new HistoryRecordUpdateClass();
+
+        historyRecordUpdateClass.execute(S_IdUser,S_IdBook,S_InsertTime,S_PauseTime,S_HttpURL);
+    }
+    //endregion
+
+    //region Update history data to server OLD CODE
     private void postHistoryDataToServer() {
 
         requestHistory = new StringRequest(Request.Method.POST, historyURL, new Response.Listener<String>() {
@@ -173,6 +229,8 @@ public class PlayControl extends AppCompatActivity {
 
         requestQueueHistory.add(requestHistory);
     }
+    //endregion
+
     private void postFavoriteDataToServer() {
 
         requestFavorite = new StringRequest(Request.Method.POST, favoriteURL, new Response.Listener<String>() {
@@ -374,10 +432,12 @@ public class PlayControl extends AppCompatActivity {
     private void playMedia() {
         if (!mediaPlayer.isPlaying()) {
             if (mediaPlayer!=null) {
-                mediaPlayer.start();
-                mSeekbarUpdateHandler.postDelayed(mUpdateSeekbar, 1000);
                 if(mediaPlayer.getCurrentPosition()< getPauseTime){
                     mediaPlayer.seekTo(getPauseTime);
+//                    mediaPlayer.start();
+                } else{
+                    mediaPlayer.start();
+                    mSeekbarUpdateHandler.postDelayed(mUpdateSeekbar, 1000);
                 }
 //                Toast.makeText(activity, "Playback Started From Server",
                 if(mediaPlayer.isPlaying()){
@@ -463,7 +523,14 @@ public class PlayControl extends AppCompatActivity {
             lastPlayDuration = mediaPlayer.getCurrentPosition();
         }
         if (!getFileUrlChapter.isEmpty()) {
-            postHistoryDataToServer();
+            //TODO update history when destroy activity
+            String IdUserHolder = String.valueOf(session.getUserIdLoggedIn());
+            String IdBookHolder = String.valueOf(getIdChapter);
+            String InsertTimeHolder = String.valueOf(12345); //todo get current date when post to server
+            String PauseTimeHolder = String.valueOf(lastPlayDuration);
+            String HttpUrlHolder = String.valueOf(HttpUrlUpdateHistory);
+            HistoryRecordUpdate(IdUserHolder,IdBookHolder,InsertTimeHolder,PauseTimeHolder,HttpUrlHolder);
+//            postHistoryDataToServer();
         }
         mediaPlayer.release();
     }
