@@ -136,17 +136,19 @@ public class PlayControl extends AppCompatActivity {
 
     //region Method to Update History
     String HttpUrlUpdateHistory = "http://20121969.tk/SachNoiBKIC/UpdateHistory.php";
+    String HttpUrlUpdateFavorite = "http://20121969.tk/SachNoiBKIC/UpdateFavorite.php";
     ProgressDialog pDialog;
     String finalResult ;
     HashMap<String,String> hashMap = new HashMap<>();
     HttpParse httpParse = new HttpParse();
-    public void HistoryRecordUpdate(final String S_IdUser,
-                                    final String S_IdBook,
-                                    final String S_InsertTime,
-                                    final String S_PauseTime,
-                                    final String S_HttpURL){
+    public void UpdateRecordData(final String S_IdUser,
+                                 final String S_IdBook,
+                                 final String S_InsertTime,
+                                 final String S_PauseTime,
+                                 final String S_HttpURL,
+                                 final String S_Status){
 
-        class HistoryRecordUpdateClass extends AsyncTask<String,Void,String> {
+        class UpdateRecordDataClass extends AsyncTask<String,Void,String> {
 
             @Override
             protected void onPreExecute() {
@@ -169,13 +171,7 @@ public class PlayControl extends AppCompatActivity {
             @Override
             protected String doInBackground(String... params) {
 
-                hashMap.put("IdUser",params[0]);
-
-                hashMap.put("IdBook",params[1]);
-
-                hashMap.put("InsertTime",params[2]);
-
-                hashMap.put("PauseTime",params[3]);
+                PutHashMapToServer(params, hashMap);
 
 //                finalResult = httpParse.postRequest(hashMap, HttpUrlUpdateHistory);
                 finalResult = httpParse.postRequest(hashMap, params[4]);
@@ -184,9 +180,35 @@ public class PlayControl extends AppCompatActivity {
             }
         }
 
-        HistoryRecordUpdateClass historyRecordUpdateClass = new HistoryRecordUpdateClass();
+        UpdateRecordDataClass updateRecordDataClass = new UpdateRecordDataClass();
 
-        historyRecordUpdateClass.execute(S_IdUser,S_IdBook,S_InsertTime,S_PauseTime,S_HttpURL);
+        updateRecordDataClass.execute(S_IdUser,S_IdBook,S_InsertTime,S_PauseTime,S_HttpURL,S_Status);
+    }
+
+    private HashMap <String, String> PutHashMapToServer(String [] params, HashMap<String,String> hashMap) {
+
+        if(params[4].equals(HttpUrlUpdateHistory)){
+
+            hashMap.put("IdUser",params[0]);
+
+            hashMap.put("IdBook",params[1]);
+
+            hashMap.put("InsertTime",params[2]);
+
+            hashMap.put("PauseTime",params[3]);
+        }
+        if(params[4].equals(HttpUrlUpdateFavorite)){
+
+            hashMap.put("IdUser",params[0]);
+
+            hashMap.put("IdBook",params[1]);
+
+            hashMap.put("InsertTime",params[2]);
+
+            hashMap.put("Status",params[5]);
+        }
+
+        return hashMap;
     }
     //endregion
 
@@ -324,6 +346,13 @@ public class PlayControl extends AppCompatActivity {
             switch (view.getId()){
                 case R.id.btn_add_favorite:
                     postFavoriteDataToServer();
+//                    String IdUserHolder = String.valueOf(session.getUserIdLoggedIn());
+//                    String IdBookHolder = String.valueOf(getIdChapter);
+//                    String InsertTimeHolder = String.valueOf(12345); //todo get current date when post to server
+//                    String PauseTimeHolder = String.valueOf(lastPlayDuration);
+//                    String HttpUrlHolder = String.valueOf(HttpUrlUpdateFavorite);
+//                    String Status = String.valueOf(5);
+//                    UpdateRecordData(IdUserHolder,IdBookHolder,InsertTimeHolder,PauseTimeHolder,HttpUrlHolder,Status);
                     break;
                 case R.id.btn_play :
                     playMedia();
@@ -437,12 +466,11 @@ public class PlayControl extends AppCompatActivity {
 //                    mediaPlayer.start();
                 } else{
                     mediaPlayer.start();
-                    mSeekbarUpdateHandler.postDelayed(mUpdateSeekbar, 1000);
+//                    mSeekbarUpdateHandler.postDelayed(mUpdateSeekbar, 1000);
                 }
 //                Toast.makeText(activity, "Playback Started From Server",
                 if(mediaPlayer.isPlaying()){
-                    Toast.makeText(activity, "Đang chạy, vui lòng chờ!",
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity,"Đang chạy, vui lòng chờ!",Toast.LENGTH_SHORT).show();
                     mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
                         public void onCompletion(MediaPlayer mediaPlayer) {
@@ -529,7 +557,7 @@ public class PlayControl extends AppCompatActivity {
             String InsertTimeHolder = String.valueOf(12345); //todo get current date when post to server
             String PauseTimeHolder = String.valueOf(lastPlayDuration);
             String HttpUrlHolder = String.valueOf(HttpUrlUpdateHistory);
-            HistoryRecordUpdate(IdUserHolder,IdBookHolder,InsertTimeHolder,PauseTimeHolder,HttpUrlHolder);
+            UpdateRecordData(IdUserHolder,IdBookHolder,InsertTimeHolder,PauseTimeHolder,HttpUrlHolder,"0");
 //            postHistoryDataToServer();
         }
         mediaPlayer.release();
